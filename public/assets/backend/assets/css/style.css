@@ -1,0 +1,239 @@
+/*================================================================================
+	Item Name: Vuexy - Vuejs, HTML & Laravel Admin Dashboard Template
+	Version: 2.0
+	Author: PIXINVENT
+	Author URL: http://www.themeforest.net/user/pixinvent
+================================================================================
+
+NOTE:
+------
+PLACE HERE YOUR OWN SCSS CODES AND IF NEEDED, OVERRIDE THE STYLES FROM THE OTHER STYLESHEETS.
+WE WILL RELEASE FUTURE UPDATES SO IN ORDER TO NOT OVERWRITE YOUR STYLES IT'S BETTER LIKE THIS.  */
+
+
+v-content-rendering {
+    display: block;
+}
+
+.fade-animation {
+    animation: fadeIn 0.6s ease;
+}
+
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
+.datepicker-container {
+    z-index: 99999999999999999 !important;
+}
+
+.dropify-wrapper.has-preview div.invalid-feedback {
+    z-index: 999 !important;
+    position: relative !important;
+    font-size: 18px !important;
+}
+
+.nowrap {
+    white-space: nowrap;
+}
+
+.select2-search__field {
+    padding: 4px !important;
+}
+
+.select2-search__field:focus {
+    outline: none;
+}
+
+.select2 {
+    width: 98%;
+}
+
+.brand-text {
+    font-family: 'Quicksand', sans-serif;
+    font-weight: bold !important;
+}
+
+body {
+    font-family: 'Quicksand', sans-serif !important;
+}
+
+/*
+Select group
+ */
+.form-selectgroup {
+    display: inline-flex;
+    margin: 0 -.5rem -.5rem 0;
+    flex-wrap: wrap;
+}
+
+.form-selectgroup .form-selectgroup-item {
+    margin: 0 .5rem .5rem 0;
+}
+
+.form-selectgroup-vertical {
+    flex-direction: column;
+}
+
+.form-selectgroup-item {
+    display: block;
+    position: relative;
+}
+
+.form-selectgroup-input {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: -1;
+    opacity: 0;
+}
+
+.form-selectgroup-label {
+    position: relative;
+    display: block;
+    min-width: calc(1.4285714em + 0.875rem + 2px);
+    margin: 0;
+    padding: 0.4375rem 0.75rem;
+    font-size: 0.875rem;
+    line-height: 1.4285714;
+    color: #6e7582;
+    background: #ffffff;
+    text-align: center;
+    cursor: pointer;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    border: 1px solid rgba(110, 117, 130, 0.2);
+    border-radius: 3px;
+    transition: border-color .3s, background .3s, color .3s;
+}
+
+.form-selectgroup-label .icon:only-child {
+    margin: 0 -.25rem;
+}
+
+.form-selectgroup-label:hover {
+    color: #354052;
+}
+
+.form-selectgroup-check {
+    display: inline-block;
+    width: 1rem;
+    height: 1rem;
+    border: 1px solid rgba(110, 117, 130, 0.2);
+    vertical-align: middle;
+}
+
+.form-selectgroup-input[type="checkbox"]+.form-selectgroup-label .form-selectgroup-check {
+    border-radius: 3px;
+}
+
+.form-selectgroup-input[type="radio"]+.form-selectgroup-label .form-selectgroup-check {
+    border-radius: 50%;
+}
+
+.form-selectgroup-input:checked+.form-selectgroup-label .form-selectgroup-check {
+    background-color: #F2BF32;
+    background-repeat: repeat;
+    background-position: center;
+    background-size: 1rem;
+    border-color: rgba(110, 117, 130, 0.2);
+}
+
+.form-selectgroup-input[type="checkbox"]:checked+.form-selectgroup-label .form-selectgroup-check {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' width='16' height='16'%3e%3cpath fill='none' stroke='%23ffffff' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M4 8.5l2.5 2.5l5.5 -5.5'/%3e%3c/svg%3e");
+}
+
+.form-selectgroup-input[type="radio"]:checked+.form-selectgroup-label .form-selectgroup-check {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3ccircle r='3' fill='%23ffffff' cx='8' cy='8' /%3e%3c/svg%3e");
+}
+
+.form-selectgroup-input:checked+.form-selectgroup-label {
+    z-index: 1;
+    color: #F2BF32;
+    background: rgba(59, 183, 126, 0.09);
+    border-color: #F2BF32;
+    box-shadow: 0 1px 1px 0 rgba(59, 183, 126, 0.2);
+}
+
+.form-selectgroup-input:focus+.form-selectgroup-label {
+    z-index: 2;
+    color: #F2BF32;
+    border-color: #F2BF32;
+    box-shadow: 0 0 0 0.2rem rgba(59, 183, 126, 0.2);
+}
+
+/**
+Alternate version of form select group
+ */
+.form-selectgroup-boxes .form-selectgroup-label {
+    text-align: left;
+    padding: 1.25rem 1.25rem;
+    color: inherit;
+}
+
+.form-selectgroup-boxes .form-selectgroup-input:checked+.form-selectgroup-label {
+    color: inherit;
+}
+
+.form-selectgroup-boxes .form-selectgroup-input:checked+.form-selectgroup-label .form-selectgroup-title {
+    color: #F2BF32;
+}
+
+.form-selectgroup-boxes .form-selectgroup-input:checked+.form-selectgroup-label .form-selectgroup-label-content {
+    opacity: 1;
+}
+
+/**
+Select group
+ */
+.form-selectgroup-pills {
+    flex-wrap: wrap;
+    align-items: flex-start;
+}
+
+.form-selectgroup-pills .form-selectgroup-item {
+    flex-grow: 0;
+}
+
+.form-selectgroup-pills .form-selectgroup-label {
+    border-radius: 50px;
+}
+
+.avatar {
+    --tblr-avatar-size: 2.5rem;
+    --tblr-avatar-bg: var(--tblr-border-color-light);
+    position: relative;
+    width: var(--tblr-avatar-size);
+    height: var(--tblr-avatar-size);
+    font-size: calc(var(--tblr-avatar-size)/ 2.8571428572);
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #626976;
+    text-align: center;
+    text-transform: uppercase;
+    vertical-align: bottom;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    background: var(--tblr-avatar-bg) no-repeat center/cover;
+    border-radius: 4px;
+}
+
+.me-3 {
+    margin-right: 1rem !important;
+}
+
+.dt-checkboxes {
+    pointer-events: none !important;
+}
