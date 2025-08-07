@@ -66,7 +66,6 @@
                     <tr>
                         <th rowspan="2">No</th>
                         <th rowspan="2">Sasaran Kinerja</th>
-                        <th rowspan="2">Proram Studi</th>
                         <th rowspan="2">Indikator Kinerja Kegiatan</th>
                         <th colspan="2">Triwulan 1</th>
                         <th colspan="2">Triwulan 2</th>
@@ -85,7 +84,70 @@
                     </tr>
                 </thead>
                 <tbody>
+                    @php
+                        $grouped = collect($sasaran_kinerja)
+                            ->flatMap(function ($sasaran) {
+                                return $sasaran->indikatorKinerjaKegiatans->map(function ($indikator) use ($sasaran) {
+                                    $indikator->sasaran_nama = $sasaran->nama;
+                                    return $indikator;
+                                });
+                            })
+                            ->groupBy('program_studi');
+                    @endphp
                     @php $no = 1; @endphp
+                    @foreach ($grouped as $programStudi => $indikators)
+                        <tr>
+                            <td colspan="12" class="fw-bold bg-light text-uppercase">
+                                {{ $programStudi ?: 'Tanpa Program Studi' }}</td>
+                        </tr>
+
+                        @foreach ($indikators as $indikator)
+                            @php
+                                $targets = collect($indikator->targetRealisasis);
+                                $targetTriwulan = [];
+                                $realisasiTriwulan = [];
+                            @endphp
+                            <tr data-id="{{ $indikator->id }}">
+                                <td>{{ $no++ }}</td>
+                                <td class="text-start">
+                                    <p class="m-0">{{ $indikator->sasaran_nama }}</p>
+                                </td>
+                                <td class="text-start">{!! $indikator->deskripsi !!}</td>
+                                @for ($tw = 1; $tw <= 3; $tw++)
+                                    @php
+                                        $data = $targets->firstWhere('triwulan', $tw);
+                                        $target = $data?->target ?? 0;
+                                        $realisasi = $data?->realisasi ?? 0;
+                                        $targetTriwulan[$tw] = $target;
+                                        $realisasiTriwulan[$tw] = $realisasi;
+                                    @endphp
+                                    <td contenteditable="true" class="editable text-center"
+                                        data-field="tw{{ $tw }}_target">{{ $target }}</td>
+                                    <td contenteditable="true" class="editable text-center"
+                                        data-field="tw{{ $tw }}_realisasi">{{ $realisasi }}</td>
+                                @endfor
+                                @php
+                                    $targetAkhir = array_sum($targetTriwulan);
+                                    $realisasiAkhir = array_sum($realisasiTriwulan);
+                                @endphp
+                                <td class="text-center total-target"><strong>{{ $targetAkhir }}</strong></td>
+                                <td class="text-center total-realisasi"><strong>{{ $realisasiAkhir }}</strong></td>
+                                <td class="text-center">
+                                    @php
+                                        $file = $targets->firstWhere('file_pendukung', '!=', null)?->file_pendukung;
+                                    @endphp
+                                    @if ($file)
+                                        <a href="{{ asset('storage/' . $file) }}" target="_blank"
+                                            class="btn btn-outline-primary btn-sm">📎 Lihat</a>
+                                    @else
+                                        <span class="badge bg-light text-muted">Tidak ada</span>
+                                    @endif
+                                </td>
+                            </tr>
+                        @endforeach
+                    @endforeach
+
+                    {{-- @php $no = 1; @endphp
                     @foreach ($sasaran_kinerja as $sasaran)
                         @php
                             $indikators = $sasaran->indikatorKinerjaKegiatans;
@@ -138,7 +200,7 @@
                                 </td>
                             </tr>
                         @endforeach
-                    @endforeach
+                    @endforeach --}}
                 </tbody>
             </table>
         </div>
@@ -148,10 +210,12 @@
                 <h5 class="mb-0">Grafik Target vs Realisasi Indikator Kinerja</h5>
             </div>
             <div class="card-body">
-               <div class="col-lg-6 col-md-12 col-12-12">
+                <div class="col-lg-6 col-md-12 col-12-12">
                     <div class="mb-3">
                         <label for="indikatorSelect">Pilih Indikator</label>
-                        <select id="indikatorSelect" style="max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" class="form-control"></select>
+                        <select id="indikatorSelect"
+                            style="max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"
+                            class="form-control"></select>
                     </div>
                 </div>
 

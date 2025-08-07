@@ -66,6 +66,7 @@
         .col-total {
             width: 5%;
         }
+
         .text-center {
             text-align: center;
         }
@@ -82,9 +83,8 @@
     <table>
         <thead>
             <tr>
-                <th class="col-no" rowspan="2"  >No</th>
+                <th class="col-no" rowspan="2">No</th>
                 <th class="col-sasaran" rowspan="2">Sasaran Kinerja</th>
-                <th class="col-prodi" rowspan="2">Prodi</th>
                 <th class="col-indikator" rowspan="2">Indikator Kinerja Kegiatan</th>
                 <th class="col-target" colspan="2">Triwulan 1</th>
                 <th class="col-target" colspan="2">Triwulan 2</th>
@@ -102,26 +102,34 @@
             </tr>
         </thead>
         <tbody>
+            @php
+                $grouped = collect($data)
+                    ->flatMap(function ($sasaran) {
+                        return $sasaran->indikatorKinerjaKegiatans->map(function ($indikator) use ($sasaran) {
+                            $indikator->sasaran_nama = $sasaran->nama;
+                            return $indikator;
+                        });
+                    })
+                    ->groupBy('program_studi');
+            @endphp
             @php $no = 1; @endphp
-            @foreach ($data as $sasaran)
-                @php
-                    $indikators = $sasaran->indikatorKinerjaKegiatans;
-                    $rowspan = $indikators->count();
-                @endphp
-                @foreach ($indikators as $index => $indikator)
+            @foreach ($grouped as $programStudi => $indikators)
+                <tr>
+                    <td colspan="11" class="fw-bold bg-light text-uppercase">
+                        {{ $programStudi ?: 'Tanpa Program Studi' }}</td>
+                </tr>
+
+                @foreach ($indikators as $indikator)
                     @php
                         $targets = collect($indikator->targetRealisasis);
                         $targetTriwulan = [];
                         $realisasiTriwulan = [];
                     @endphp
                     <tr data-id="{{ $indikator->id }}">
-                        @if ($index == 0)
-                            <td rowspan="{{ $rowspan }}">{{ $no++ }}</td>
-                            <td rowspan="{{ $rowspan }}" class="text-start">
-                                <p class="m-0">{{ $sasaran->nama }}</p>
-                            </td>
-                        @endif
-                        <td class="text-center">{{ $indikator->program_studi ?? '' }}</td>
+                        <td>{{ $no++ }}</td>
+                        <td class="text-start">
+                            <p class="m-0">{{ $indikator->sasaran_nama }}</p>
+                        </td>
                         <td class="text-start">{!! $indikator->deskripsi !!}</td>
                         @for ($tw = 1; $tw <= 3; $tw++)
                             @php
@@ -132,7 +140,7 @@
                                 $realisasiTriwulan[$tw] = $realisasi;
                             @endphp
                             <td>{{ $target }}</td>
-                            <td >{{ $realisasi }}</td>
+                            <td>{{ $realisasi }}</td>
                         @endfor
                         @php
                             $targetAkhir = array_sum($targetTriwulan);

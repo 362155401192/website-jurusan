@@ -265,8 +265,10 @@ class HomeController extends Controller
     public function indikator_kinerja(Request $request, $prodi = null)
     {
         $tahun = $request->tahun ?? Carbon::now()->year;
+        $prodi = $prodi ?? $request->prodi;
 
         $data = $this->getIndikatorData($tahun, $prodi);
+
         return view('frontend.home.akademik.indikator-kinerja', [
             'title' => 'Indikator Kinerja Utama Jurusan',
             'sasaran_kinerja' => $data,

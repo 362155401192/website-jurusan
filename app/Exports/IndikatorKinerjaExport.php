@@ -15,10 +15,19 @@ class IndikatorKinerjaExport implements FromArray, WithHeadings, WithEvents, Wit
 
     protected $data;
     protected $rowCount = 0;
+    protected $grouped = [];
 
     public function __construct($data)
     {
         $this->data = $data;
+        $this->grouped = collect($data)
+            ->flatMap(function ($sasaran) {
+                return $sasaran->indikatorKinerjaKegiatans->map(function ($indikator) use ($sasaran) {
+                    $indikator->sasaran_nama = $sasaran->nama;
+                    return $indikator;
+                });
+            })
+            ->groupBy('program_studi');
     }
 
     public function array(): array
@@ -26,16 +35,15 @@ class IndikatorKinerjaExport implements FromArray, WithHeadings, WithEvents, Wit
         $result = [];
         $no = 1;
 
-        foreach ($this->data as $sasaran) {
-            $indikators = $sasaran->indikatorKinerjaKegiatans;
-
+        foreach ($this->grouped as $programStudi => $indikators) {
+            // Tambahkan baris program studi
+            $result[] = [$programStudi];
             foreach ($indikators as $indikator) {
                 $targets = collect($indikator->targetRealisasis);
-
                 $row = [];
+
                 $row[] = $no++;
-                $row[] = $sasaran->nama;
-                $row[] = $indikator->program_studi;
+                $row[] = $indikator->sasaran_nama;
                 $row[] = strip_tags($indikator->deskripsi);
 
                 $targetTriwulan = [];
@@ -59,18 +67,17 @@ class IndikatorKinerjaExport implements FromArray, WithHeadings, WithEvents, Wit
             }
         }
         $this->rowCount = count($result);
-
+        // dd($result);
         return $result;
     }
 
 
-    public function headings(): array
+       public function headings(): array
     {
         return [
             [
                 'No',
                 'Sasaran Kinerja',
-                'Program Studi',
                 'Indikator Kinerja Kegiatan',
                 'Triwulan 1',
                 '',
@@ -82,7 +89,6 @@ class IndikatorKinerjaExport implements FromArray, WithHeadings, WithEvents, Wit
                 'Realisasi Akhir'
             ],
             [
-                '',
                 '',
                 '',
                 '',
@@ -101,8 +107,8 @@ class IndikatorKinerjaExport implements FromArray, WithHeadings, WithEvents, Wit
     public function styles(Worksheet $sheet)
     {
         return [
-            1    => ['font' => ['bold' => true]], // Baris 1 bold
-            2    => ['font' => ['bold' => true]], // Baris 2 bold
+            1 => ['font' => ['bold' => true]],
+            2 => ['font' => ['bold' => true]],
         ];
     }
 
@@ -110,61 +116,63 @@ class IndikatorKinerjaExport implements FromArray, WithHeadings, WithEvents, Wit
     {
         return [
             AfterSheet::class => function (AfterSheet $event) {
-                // Merge headers
                 $sheet = $event->sheet->getDelegate();
 
+                // Merge headers
                 $sheet->mergeCells('A1:A2'); // No
                 $sheet->mergeCells('B1:B2'); // Sasaran Kinerja
-                $sheet->mergeCells('C1:C2'); // Program Studi
-                $sheet->mergeCells('D1:D2'); // Indikator Kinerja Kegiatan
-                $sheet->mergeCells('E1:F1'); // TW1
-                $sheet->mergeCells('G1:H1'); // TW2
-                $sheet->mergeCells('I1:J1'); // TW3
-                $sheet->mergeCells('K1:K2'); // Target Akhir
-                $sheet->mergeCells('L1:L2'); // Realisasi Akhir
+                $sheet->mergeCells('C1:C2'); // Indikator
+                $sheet->mergeCells('D1:E1'); // TW1
+                $sheet->mergeCells('F1:G1'); // TW2
+                $sheet->mergeCells('H1:I1'); // TW3
+                $sheet->mergeCells('J1:J2'); // Target Akhir
+                $sheet->mergeCells('K1:K2'); // Realisasi Akhir
 
-                $sheet->getStyle('A1:L2')->applyFromArray([
+                // Header style
+                $sheet->getStyle('A1:K2')->applyFromArray([
                     'fill' => [
                         'fillType' => Fill::FILL_SOLID,
                         'startColor' => [
-                            'rgb' => '093D96' // Warna biru terang
-                        ]
+                            'rgb' => '093D96',
+                        ],
                     ],
                     'font' => [
                         'bold' => true,
-                        'color' => ['rgb' => 'FFFFFF'], // Teks putih
+                        'color' => ['rgb' => 'FFFFFF'],
+                    ],
+                    'alignment' => [
+                        'horizontal' => 'center',
+                        'vertical' => 'center',
                     ],
                 ]);
 
-                // Border all cells
-                $lastRow = $this->rowCount + 1; // +1 for 2 header rows
-                $sheet->getStyle("A1:L{$lastRow}")->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
-                $sheet->getStyle("A1:L2")->getAlignment()->setHorizontal('center')->setVertical('center')->setWrapText(false);
+                $lastRow = $this->rowCount + 2; // +2 karena header 2 baris
+                $sheet->getStyle("A1:K{$lastRow}")
+                      ->getBorders()->getAllBorders()
+                      ->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
 
-                $currentRow = 3; // Mulai dari baris ke-3 karena baris 1-2 adalah heading
+                // Style untuk baris program studi
+                $currentRow = 3;
+                foreach ($this->grouped as $programStudi => $indikators) {
+                    // Merge dan style program studi row
+                    $sheet->mergeCells("A{$currentRow}:K{$currentRow}");
+                    $sheet->setCellValue("A{$currentRow}", $programStudi);
+                    $sheet->getStyle("A{$currentRow}")
+                        ->applyFromArray([
+                            'font' => ['bold' => true],
+                            'fill' => [
+                                'fillType' => Fill::FILL_SOLID,
+                                'startColor' => ['rgb' => 'EDEDED']
+                            ],
+                            'alignment' => [
+                                'horizontal' => 'left',
+                                'vertical' => 'center',
+                            ],
+                        ]);
+                    $currentRow++;
 
-                $mergedSasaranStart = $currentRow;
-                $prevSasaran = $this->data[0]->nama ?? null;
-                $no = 1;
-
-                foreach ($this->data as $sasaran) {
-                    $indikatorCount = count($sasaran->indikatorKinerjaKegiatans);
-                    if ($indikatorCount > 0) {
-                        $startRow = $mergedSasaranStart;
-                        $endRow = $mergedSasaranStart + $indikatorCount - 1;
-
-                        // Merge kolom No dan Sasaran Kinerja jika lebih dari satu indikator
-                        if ($indikatorCount > 1) {
-                            $sheet->mergeCells("A{$startRow}:A{$endRow}");
-                            $sheet->mergeCells("B{$startRow}:B{$endRow}");
-                        }
-
-                        // Nomor juga ditulis hanya di baris awal
-                        $sheet->setCellValue("A{$startRow}", $no++);
-                        $sheet->setCellValue("B{$startRow}", $sasaran->nama);
-
-                        $mergedSasaranStart = $endRow + 1;
-                    }
+                    // Lewati baris indikator sebanyak jumlah indikator
+                    $currentRow += count($indikators);
                 }
             }
         ];
