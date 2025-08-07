@@ -2,8 +2,8 @@
 
 @section('content')
     <div class="row">
-        @foreach($prestasi_per_prodi as $prodi)
-            <div class="col-md-3 col-sm-6 mb-3 d-flex">
+        @foreach ($prestasi_per_prodi as $prodi)
+            <div class="col-md-4 col-sm-6 mb-3 d-flex">
                 <div class="card text-center w-100 d-flex flex-column">
                     <div class="card-body d-flex flex-column justify-content-center">
                         <h4>{{ $prodi->achievements_count }}</h4>
@@ -28,12 +28,12 @@
         </div>
 
         <!-- Per Jenis Staff -->
-        <div class="col-md-4 col-sm-6 mb-3 d-flex">
+        <div class="col-md-6 col-sm-6 mb-3 d-flex">
             <div class="card text-center w-100 d-flex flex-column">
                 <div class="card-body d-flex flex-column justify-content-center">
                     <h5 class="mb-2">Jumlah Staff per Jenis</h5>
                     <div class="row">
-                        @foreach($jenis_staff as $jenis)
+                        @foreach ($jenis_staff as $jenis)
                             <div class="col-4">
                                 <strong>{{ $jenis->employee_count }}</strong>
                                 <p class="mb-0">{{ ucfirst($jenis->name) }}</p>
@@ -57,80 +57,41 @@
 
 
     {{-- Grafik Indikator Kinerja Utama --}}
-    {{-- <div class="card mb-4">
+    <div class="card mb-4">
         <div class="card-header">
             <h5 class="mb-0">Grafik Target vs Realisasi Indikator Kinerja</h5>
         </div>
         <div class="card-body">
-            <canvas id="grafik-indikator" height="150"></canvas>
+            <div class="row">
+                <div class="col-lg-6 col-md-12 col-12-12">
+                    <div class="mb-3">
+                        <label for="indikatorSelect">Pilih Indikator</label>
+                        <select id="indikatorSelect" style="max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" class="form-control"></select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <!-- Card Triwulan -->
+                <div class="col-md-8">
+                    <div class="card" style="height: calc(400px - 1rem);">
+                        <div class="card-body">
+                            <div id="chartTriwulan"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card Target Akhir -->
+                <div class="col-md-4">
+                    <div class="card" style="height: calc(400px - 1rem);">
+                        <div class="card-body">
+                            <div id="chartAkhir"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-    </div> --}}
+    </div>
+
 
 @endsection
-
-
-
-
-@push('scripts')
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script>
-        const ctx = document.getElementById('grafik-indikator').getContext('2d');
-
-        new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: @json($grafik_labels),
-                datasets: [
-                    {
-                        label: 'Target',
-                        data: @json($grafik_target),
-                        backgroundColor: 'rgba(54, 162, 235, 0.7)',
-                    },
-                    {
-                        label: 'Realisasi',
-                        data: @json($grafik_realisasi),
-                        backgroundColor: 'rgba(75, 192, 192, 0.7)',
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    tooltip: {
-                        mode: 'index',
-                        intersect: false,
-                    },
-                    legend: {
-                        position: 'top',
-                    },
-                },
-                interaction: {
-                    mode: 'nearest',
-                    axis: 'x',
-                    intersect: false
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: {
-                            stepSize: 1
-                        },
-                        title: {
-                            display: true,
-                            text: 'Nilai'
-                        }
-                    },
-                    x: {
-                        ticks: {
-                            autoSkip: false,
-                            maxRotation: 45,
-                            minRotation: 45
-                        }
-                    }
-                }
-            }
-        });
-    </script>
-@endpush
-
-

@@ -19,6 +19,8 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Log;
 
 use App\Models\Page; // Import model Page
+use Carbon\Carbon;
+
 class HomeController extends Controller
 
 {
@@ -65,7 +67,7 @@ class HomeController extends Controller
     }
 
 
-      // Mengatur data yang akan digunakan dalam tampilan beranda
+    // Mengatur data yang akan digunakan dalam tampilan beranda
 
     // Mengatur data yang akan digunakan dalam tampilan dokumen
     public function document()
@@ -74,7 +76,7 @@ class HomeController extends Controller
             'title' => 'Dokumen',
             'documents' => Document::with(['documentType'])->where('is_publish', true)->get(),
         ];
-    // Menampilkan tampilan dokumen dengan data yang telah ditentukan
+        // Menampilkan tampilan dokumen dengan data yang telah ditentukan
         return view('frontend.home./dokumen.document', $data);
     }
 
@@ -85,7 +87,7 @@ class HomeController extends Controller
         $event = Event::where(['slug' => $slug, 'is_publish' => true])->first();
         // Jika acara ditemukan
         if ($event) {
-             // Mengatur data yang akan digunakan dalam tampilan acara
+            // Mengatur data yang akan digunakan dalam tampilan acara
             $data = [
                 'title' => $event->title,
                 'event' => $event,
@@ -93,20 +95,20 @@ class HomeController extends Controller
             // Menampilkan tampilan acara dengan data yang telah ditentukan
             return view('frontend.home.event', $data);
         } else {
-             // Jika acara tidak ditemukan, tampilkan halaman error 404
+            // Jika acara tidak ditemukan, tampilkan halaman error 404
             abort(404);
         }
     }
     // Menampilkan halaman All Event.
     public function allevent()
-{
-    $data = [
-        'title' => 'All Berita Dan Event Jurusan',
-        'events' => Event::where('is_publish', true)->get()
-    ];
+    {
+        $data = [
+            'title' => 'All Berita Dan Event Jurusan',
+            'events' => Event::where('is_publish', true)->get()
+        ];
 
-    return view('frontend.home.all_event', $data);
-}
+        return view('frontend.home.all_event', $data);
+    }
 
 
 
@@ -134,7 +136,7 @@ class HomeController extends Controller
 
 
     // Menampilkan halaman visi dan misi jurusan
-  	public function visimisi()
+    public function visimisi()
     {
         $data = [
             'title' => 'Visi dan Misi',
@@ -145,7 +147,7 @@ class HomeController extends Controller
 
 
     // Menampilkan halaman struktur organisasi jurusan
-  	public function organisasi()
+    public function organisasi()
     {
         $data = [
             'title' => 'Struktur Organisasi',
@@ -176,7 +178,7 @@ class HomeController extends Controller
 
         return view('frontend.home./akademik.trpl', $data);
     }
-  	public function trk()
+    public function trk()
     {
         $data = [
             'title' => 'D4 Terapan Rekayasa Komputer',
@@ -184,7 +186,7 @@ class HomeController extends Controller
 
         return view('frontend.home./akademik.trk', $data);
     }
-  	public function bsd()
+    public function bsd()
     {
         $data = [
             'title' => 'D4 Terapan Bisnis Digital',
@@ -262,54 +264,68 @@ class HomeController extends Controller
 
     public function indikator_kinerja(Request $request, $prodi = null)
     {
-        $tahun = $request->get('tahun', date('Y'));
-        $sasaran_kinerja = $this->getIndikatorData($tahun, $prodi);
+        $tahun = $request->tahun ?? Carbon::now()->year;
 
+        $data = $this->getIndikatorData($tahun, $prodi);
         return view('frontend.home.akademik.indikator-kinerja', [
             'title' => 'Indikator Kinerja Utama Jurusan',
-            'sasaran_kinerja' => $sasaran_kinerja,
+            'sasaran_kinerja' => $data,
             'tahun' => $tahun,
             'prodi' => $prodi
         ]);
     }
 
-
-
-    public function export_indikator_kinerja($format, Request $request)
+    public function export_indikator_kinerja($format, Request $request, $prodi = null, $tahun = null)
     {
-        $tahun = $request->get('tahun', date('Y'));
-        $prodi = $request->get('prodi');
-        $data = $this->getIndikatorData($tahun, $prodi);
+        $tahun = $tahun ?? $request->get('tahun', date('Y'));
+        $prodi = $prodi ?? $request->get('prodi');
 
+        $data = $this->getIndikatorData($tahun, $prodi);
         if ($format === 'excel') {
-            return Excel::download(new IndikatorKinerjaExport($data, $tahun, $prodi), 'indikator-kinerja.xlsx');
+            return Excel::download(new IndikatorKinerjaExport($data, $tahun, $prodi), 'Indikator Kinerja.xlsx');
         }
 
         if ($format === 'pdf') {
-            $pdf = Pdf::loadView('export.indikator_kinerja_pdf', compact('data', 'tahun', 'prodi'))
-            ->setPaper('a4', 'landscape');
-
-            return $pdf->stream('indikator-kinerja.pdf');
+            $pdf = Pdf::loadView('frontend.home.akademik.partials.export-pdf', compact('data', 'tahun', 'prodi'))
+                ->setPaper('a4', 'landscape');
+            return $pdf->stream('Indikator Kinerja.pdf');
         }
 
         abort(404);
     }
 
 
-
-    private function getIndikatorData($tahun, $prodi = null)
+   protected function getIndikatorData($tahun, $prodi)
     {
-        return SasaranKinerja::with([
-            'indikatorKinerjaKegiatans' => function ($query) use ($tahun, $prodi) {
-                if ($prodi) {
-                    $query->where('program_studi', $prodi);
+        $query = SasaranKinerja::with([
+            'indikatorKinerjaKegiatans' => function ($q) use ($tahun, $prodi) {
+                if ($prodi && $prodi !== 'all') {
+                    $q->where('program_studi', $prodi);
                 }
-                $query->with(['targetRealisasis' => function ($q) use ($tahun) {
-                    $q->where('tahun', $tahun);
-                }]);
+
+                $q->whereHas('targetRealisasis', function ($q2) use ($tahun) {
+                    if ($tahun !== 'all') {
+                        $q2->where('tahun', $tahun);
+                    }
+                })->with([
+                    'targetRealisasis' => function ($q3) use ($tahun) {
+                        if ($tahun !== 'all') {
+                            $q3->where('tahun', $tahun);
+                        }
+                    }
+                ]);
             }
-        ])->get();
+        ])
+        ->whereHas('indikatorKinerjaKegiatans.targetRealisasis', function ($q) use ($tahun) {
+            if ($tahun !== 'all') {
+                $q->where('tahun', $tahun);
+            }
+        });
+
+        return $query->get();
     }
+
+
 
 
 
@@ -321,9 +337,9 @@ class HomeController extends Controller
         $showAll = $request->get('show') === 'all';
 
         $achievements = \App\Models\Achievement::with(['user', 'achievementType', 'achievementLevel', 'achievementProgramStudi'])
-        ->when(!$showAll, function ($query) {
-            $query->where('is_publish', true);
-        })
+            ->when(!$showAll, function ($query) {
+                $query->where('is_publish', true);
+            })
             ->latest()
             ->get();
 
@@ -424,7 +440,8 @@ class HomeController extends Controller
 
 
     //Request Token Otomaatiss
-    private function requestToken() {
+    private function requestToken()
+    {
         $response = Http::post('https://sister-api.kemdikbud.go.id/ws.php/1.0/authorize', [
             'username' => '09YM1FlfP802J4IGwJpiQwpM4iAMiSGNNst06DrjBMcHgTfz2bDt5hRc2yTZPvJ4dwxADm9qXP8GE132sQuydEvMXewUTIMB0grxwMRQkuw',
             'password' => 'rMYLRo2t/tIjZPo11Yw4BvF+zOezlnV1hMhpe2Ox9YrwFh8fBRos10aPkbYALSwFtO1iiMRbmmt6egaumNnesQPHNAn4niWSnwg1dBc4KOMqVD0QD9/dlOtdnynG22Z5',
@@ -435,5 +452,4 @@ class HomeController extends Controller
 
         return $data['token'];
     }
-
 }

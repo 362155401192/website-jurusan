@@ -75,5 +75,6 @@
     <script src="{{ asset('assets/backend/app-assets/js/core/app.js') }}"></script>
     <script src="{{ asset('assets/backend/app-assets/js/scripts/components.js') }}"></script>
     <!-- END: Theme JS-->
+
     <script src="{{ asset('assets/backend/assets/js/custom.js') }}"></script>
 @endsection

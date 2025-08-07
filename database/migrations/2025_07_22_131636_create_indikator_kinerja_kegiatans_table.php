@@ -11,7 +11,7 @@ return new class extends Migration
         Schema::create('indikator_kinerja_kegiatans', function (Blueprint $table) {
             $table->id();
             $table->foreignId('sasaran_kinerja_id')->constrained('sasaran_kinerjas')->onDelete('cascade');
-            $table->string('kode'); // contoh: IKU 1.1, IKU 1.2
+            $table->string('kode');
             $table->text('deskripsi');
             $table->float('target_akhir')->default(0);
             $table->float('realisasi_akhir')->default(0);

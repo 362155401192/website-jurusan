@@ -13,7 +13,7 @@ class SasaranKinerjaController extends Controller
     {
         $title = 'Sasaran Kinerja';
         $mods = 'sasaran_kinerja'; // untuk load JS
-        return view('backend.sasaran-kinerja.index', compact('title', 'mods'));
+        return customView('sasaran-kinerja.index', compact('title', 'mods'), 'backend');
     }
 
     public function list(Request $request)
@@ -41,9 +41,19 @@ class SasaranKinerjaController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'kode' => 'required|max:10',
+            'kode' => 'required|max:10|unique:sasaran_kinerjas,kode,except,id',
             'nama' => 'required|string',
+        ],[
+            'kode.required' => 'Kode harus diisi',
+            'kode.max' => 'Kode maksimal 10 karakter',
+            'kode.unique' => 'Kode sudah digunakan',
+            'nama.required' => 'Nama harus diisi',
         ]);
+
+        $existingSasaran = SasaranKinerja::where('kode', $request->kode)->first();
+        if ($existingSasaran) {
+            return response()->json(['status' => false, 'message' => 'Kode sudah ada']);
+        }
 
         $sasaran = SasaranKinerja::updateOrCreate(
             ['id' => $request->id],
@@ -56,9 +66,15 @@ class SasaranKinerjaController extends Controller
     public function update(Request $request, $id)
     {
         $request->validate([
-            'kode' => 'required|max:10',
+           'kode' => 'required|max:10|unique:sasaran_kinerjas,kode,' . $request->id,
             'nama' => 'required|string',
+        ],[
+            'kode.required' => 'Kode harus diisi',
+            'kode.max' => 'Kode maksimal 10 karakter',
+            'kode.unique' => 'Kode sudah digunakan',
+            'nama.required' => 'Nama harus diisi',
         ]);
+
 
         $sasaran = SasaranKinerja::findOrFail($id);
         $sasaran->update([
@@ -86,13 +102,23 @@ class SasaranKinerjaController extends Controller
     /**
      * Generate daftar kode SK1 - SK10 untuk dropdown
      */
-    public function kodeOptions()
-    {
-        $kodeList = [];
-        for ($i = 1; $i <= 10; $i++) {
-            $kodeList[] = 'SK' . $i;
-        }
+    // public function kodeOptions()
+    // {
+    //     $kodeList = [];
+    //     for ($i = 1; $i <= 10; $i++) {
+    //         $kodeList[] = 'SK' . $i;
+    //     }
 
-        return response()->json($kodeList);
+    //     return response()->json($kodeList);
+    // }
+
+    public function lastCode()
+    {
+       $last = SasaranKinerja::orderBy('id', 'desc')->first();
+        $lastNumber = $last ? intval(str_replace('SK', '', $last->kode)) : 0;
+        $newKode = 'SK' . ($lastNumber + 1);
+        return response()->json([
+            'kode' => $newKode
+        ]);
     }
 }

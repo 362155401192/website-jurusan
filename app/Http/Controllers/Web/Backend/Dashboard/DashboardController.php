@@ -52,7 +52,7 @@ class DashboardController extends Controller
     private function getGrafikIndikatorData()
     {
         $data = \App\Models\IndikatorKinerjaKegiatan::select(
-            'deskripsi',         
+            'deskripsi',
             'target_akhir',
             'realisasi_akhir'
         )->get();
@@ -74,5 +74,44 @@ class DashboardController extends Controller
         ];
     }
 
+    public function chartData()
+    {
+        $data = SasaranKinerja::with([
+            'indikatorKinerjaKegiatans.targetRealisasis'
+        ])->get();
 
+        $indikatorOptions = [];
+        $chartDataset = [];
+
+        foreach ($data as $sasaran) {
+            foreach ($sasaran->indikatorKinerjaKegiatans as $indikator) {
+                $triwulan = ['1' => 0, '2' => 0, '3' => 0];
+                $triwulanRealisasi = ['1' => 0, '2' => 0, '3' => 0];
+
+                foreach ($indikator->targetRealisasis as $target) {
+                    $triwulan[$target->triwulan] = $target->target;
+                    $triwulanRealisasi[$target->triwulan] = $target->realisasi;
+                }
+
+                $chartDataset[] = [
+                    'id' => $indikator->id,
+                    'indikator' => $indikator->deskripsi,
+                    'triwulan_target' => array_values($triwulan),
+                    'triwulan_realisasi' => array_values($triwulanRealisasi),
+                    'target_akhir' => $indikator->target_akhir ?? 0,
+                    'realisasi_akhir' => $indikator->realisasi_akhir ?? 0,
+                ];
+
+                $indikatorOptions[] = [
+                    'id' => $indikator->id,
+                    'label' => $indikator->deskripsi,
+                ];
+            }
+        }
+
+        return response()->json([
+            'indikator_options' => $indikatorOptions,
+            'data' => $chartDataset,
+        ]);
+    }
 }

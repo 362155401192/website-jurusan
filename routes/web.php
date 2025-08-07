@@ -28,6 +28,7 @@ use App\Http\Controllers\Web\Backend\User\UserController;
 use App\Http\Controllers\Web\Backend\Iku\SasaranKinerjaController;
 use App\Http\Controllers\Web\Backend\Iku\IndikatorKinerjaKegiatanController;
 use App\Http\Controllers\Web\Backend\Iku\TargetRealisasiController;
+use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Route;
 
 
@@ -46,7 +47,7 @@ Route::get('/refresh-csrf', [HomeController::class, 'refreshCsrf'])->name('front
 // Front End Route
 Route::get('/', [HomeController::class, 'index'])->name('frontend.home');
 
-
+Route::get('/get-chart-data', [DashboardController::class, 'chartData']);
 
 // Jurusan Route
 Route::get('/profil', [HomeController::class, 'profil'])->name('frontend.profil');
@@ -115,8 +116,6 @@ Route::get('/presma-detail/{slug}', [HomeController::class, 'achievement'])->nam
 Route::get('/all-event', [HomeController::class, 'allevent'])->name('frontend.all_event');
 Route::get('/event/{slug}', [HomeController::class, 'event'])->name('frontend.events');
 Route::get('/{slug}', [HomeController::class, 'pageBySlug'])->name('frontend.home');
-
-
 
 
 Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified'])->group(function () {
@@ -342,25 +341,27 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
 
         // Route Sasaran Kinerja
         Route::prefix('sasaran_kinerjas')->name('sasaran-kinerja.')->group(function () {
+            Route::get('last_code', [SasaranKinerjaController::class, 'lastCode'])->name('lastCode');
             Route::get('/', [SasaranKinerjaController::class, 'index'])->name('index');
             Route::get('/list', [SasaranKinerjaController::class, 'list'])->name('list');
             Route::get('/{id}', [SasaranKinerjaController::class, 'show'])->name('show');
             Route::post('/', [SasaranKinerjaController::class, 'store'])->name('store');
-            Route::put('/{id}', [SasaranKinerjaController::class, 'update'])->name('update');
+            Route::post('/{id}', [SasaranKinerjaController::class, 'update'])->name('update');
             Route::delete('/{id}', [SasaranKinerjaController::class, 'destroy'])->name('destroy');
         });
 
-        // Route Indikator Kinerja Kegiatan 
+        // Route Indikator Kinerja Kegiatan
         Route::prefix('indikator_kinerja_kegiatans')->name('indikator-kinerja-kegiatan.')->group(function () {
+            Route::get('last_code', [IndikatorKinerjaKegiatanController::class, 'lastCode'])->name('lastCode');
             Route::get('/', [IndikatorKinerjaKegiatanController::class, 'index'])->name('index');
             Route::get('/list', [IndikatorKinerjaKegiatanController::class, 'list'])->name('list');
             Route::get('/{id}', [IndikatorKinerjaKegiatanController::class, 'show'])->name('show');
-            Route::post('/', [IndikatorKinerjaKegiatanController::class, 'store'])->name('store');
-            Route::put('/{id}', [IndikatorKinerjaKegiatanController::class, 'update'])->name('update');
+            Route::post('store', [IndikatorKinerjaKegiatanController::class, 'store'])->name('store');
+            Route::post('{id}/update', [IndikatorKinerjaKegiatanController::class, 'update'])->name('update');
             Route::delete('/{id}', [IndikatorKinerjaKegiatanController::class, 'destroy'])->name('destroy');
         });
 
-        // Route Target Realisasi 
+        // Route Target Realisasi
         Route::prefix('target_realisasis')->name('target-realisasi.')->group(function () {
             Route::get('/', [TargetRealisasiController::class, 'index'])->name('index');
             Route::get('/list', [TargetRealisasiController::class, 'list'])->name('list');

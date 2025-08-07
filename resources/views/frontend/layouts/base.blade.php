@@ -7,6 +7,7 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <link rel="icon" href="{{ asset('storage/images/' . getSetting('logo')) }}" type="image/png" sizes="16x16">
     <title>{{ $title }} - {{ getSetting('web_name') }}</title>
+    <link rel="stylesheet" type="text/css"  href="{{ asset('assets/backend/app-assets/vendors/css/charts/apexcharts.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/frontend/assets/css/main.css') }}">
 </head>
 

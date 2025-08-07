@@ -16,13 +16,15 @@ window.initTargetRealisasi = function () {
     // Ambil URL dari atribut data-url
     const ajaxUrl = $table.data('url') || '/apps/target_realisasis/list';
 
+    var groupColumn = 1;
+
     targetTable = $table.DataTable({
         processing: true,
         serverSide: true,
         ajax: ajaxUrl,
         columns: [
-            { data: 'DT_RowIndex', name: 'DT_RowIndex' },
-            { data: 'sasaran', name: 'sasaran' },
+            { data: 'DT_RowIndex', name: 'DT_RowIndex' }, // Sembunyikan indeks jika tidak perlu
+            { data: 'sasaran', name: 'sasaran', visible: false }, // Sembunyikan kolom grouping
             { data: 'indikator', name: 'indikator' },
             { data: 'tw1_target', name: 'tw1_target' },
             { data: 'tw1_realisasi', name: 'tw1_realisasi' },
@@ -32,11 +34,28 @@ window.initTargetRealisasi = function () {
             { data: 'tw3_realisasi', name: 'tw3_realisasi' },
             { data: 'action', name: 'action', orderable: false, searchable: false },
         ],
+        order: [[groupColumn, 'asc']],
+        displayLength: 25,
+        columnDefs: [
+            { visible: false, targets: groupColumn } // sembunyikan kolom 'sasaran'
+        ],
+        drawCallback: function (settings) {
+            var api = this.api();
+            var rows = api.rows({ page: 'current' }).nodes();
+            var last = null;
 
-        order: [[1, 'asc']],
-        language: {
-            url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/id.json'
-        }
+            api.column(groupColumn, { page: 'current' }).data().each(function (group, i) {
+                if (last !== group) {
+                    $(rows).eq(i).before(
+                        `<tr class="group bg-light fw-bold text-dark">
+                        <td colspan="10">Sasaran Kinerja: ${group}</td>
+                    </tr>`
+                    );
+                    last = group;
+                }
+            });
+        },
+
     });
 
     // Bind ulang event form submit (hindari duplikat)

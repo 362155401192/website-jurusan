@@ -19,7 +19,7 @@ class TargetRealisasiController extends Controller
         ->orderBy('kode')
         ->get();
 
-        return view('backend.target-realisasi.index', compact('title', 'mods', 'indikator'));
+        return customView('target-realisasi.index', compact('title', 'mods', 'indikator'), 'backend');
     }
 
 
@@ -101,7 +101,7 @@ class TargetRealisasiController extends Controller
                 'triwulan' => $request->triwulan,
                 'target' => $request->target,
                 'realisasi' => $request->realisasi,
-                'file_pendukung' => $path, 
+                'file_pendukung' => $path,
             ]
         );
 

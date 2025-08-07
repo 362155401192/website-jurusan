@@ -16,6 +16,7 @@
     <script src="{{ asset('assets/frontend/assets/js/vendors/jquery-3.5.1.min.js') }}"></script>
     <script src="{{ asset('assets/frontend/assets/js/vendors/popper.min.js') }}"></script>
     <script src="{{ asset('assets/frontend/assets/js/vendors/bootstrap.min.js') }}"></script>
+    <script src="{{ asset('assets/backend/app-assets/vendors/js/charts/apexcharts.min.js') }}"></script>
     <script src="{{ asset('assets/frontend/assets/js/vendors/bootstrap-slider.min.js') }}"></script>
     <script src="{{ asset('assets/frontend/assets/js/vendors/jquery.easing.min.js') }}"></script>
     <script src="{{ asset('assets/frontend/assets/js/vendors/owl.carousel.min.js') }}"></script>
@@ -26,6 +27,7 @@
     <script src="{{ asset('assets/frontend/assets/js/vendors/validator.min.js') }}"></script>
     <script src="{{ asset('assets/frontend/assets/js/vendors/hs.megamenu.js') }}"></script>
     <script src="{{ asset('assets/frontend/assets/js/app.js') }}"></script>
-    
+    <script src="{{ asset('js/chart-custom.js') }}"></script>
+
     <!--endbuild-->
 @endsection

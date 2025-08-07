@@ -27,7 +27,7 @@
 
             <div style="overflow-x: auto;">
                 <table class="table table-bordered" id="targetRealisasiTable" data-url="{{ route('target-realisasi.list') }}" width="100%">
-                    <thead>
+                    <thead style="text-align: center">
                         <tr>
                             <th rowspan="2">No</th>
                             <th rowspan="2">Sasaran Kinerja</th>
@@ -48,14 +48,13 @@
                     </thead>
 
                    <tbody>
-                        @php $i = 1; @endphp
+                        {{-- @php $i = 1; @endphp
                         @foreach ($indikator as $item)
                             <tr>
                                 <td class="text-center align-middle">{{ $i++ }}</td>
                                 <td class="align-middle">{{ $item->sasaranKinerja->nama ?? '-' }}</td>
                                 <td class="align-middle">{!! nl2br(e($item->deskripsi)) !!}</td>
 
-                                {{-- Triwulan 1-3 Target & Realisasi --}}
                                 @for ($tw = 1; $tw <= 3; $tw++)
                                     @php
                                         $data = $item->targetRealisasis->firstWhere('triwulan', strval($tw));
@@ -70,7 +69,7 @@
                                     </button>
                                 </td>
                             </tr>
-                        @endforeach
+                        @endforeach --}}
                     </tbody>
 
                 </table>

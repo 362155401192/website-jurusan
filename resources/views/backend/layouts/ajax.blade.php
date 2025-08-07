@@ -47,6 +47,7 @@
         window.location.reload();
     }
 </script>
+<script src="{{ asset('js/chart-custom.js') }}"></script>
 
 @if (isset($mods))
     @if (is_array($mods))

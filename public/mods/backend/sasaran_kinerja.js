@@ -30,7 +30,9 @@ $(document).ready(function () {
         let form = $(this);
         let id = $('#id').val();
         let url = '/apps/sasaran_kinerjas';
-
+        if (id) {
+            url += '/' + id;
+        }
         // Langsung pakai POST, cukup gunakan updateOrCreate di controller Laravel
         $.ajax({
             url: url,
@@ -49,24 +51,42 @@ $(document).ready(function () {
                     showConfirmButton: false
                 });
             },
-            error: function (xhr) {
+            error: function (xhr, status, error) {
+                let errorMessage = 'Terjadi kesalahan saat menyimpan data.';
+
+                if (xhr.responseJSON && xhr.responseJSON.message) {
+                    errorMessage = xhr.responseJSON.message;
+                }
                 Swal.fire({
                     icon: 'error',
                     title: 'Gagal!',
-                    text: 'Terjadi kesalahan saat menyimpan data.',
+                    text: errorMessage,
                 });
                 console.error(xhr.responseText);
             }
         });
     });
 
-    function loadKodeOptions(selected = null) {
-        $.get('/apps/sasaran_kinerjas/kode-options', function (data) {
-            const select = $('#kode');
-            select.empty().append('<option value="">-- Pilih Kode --</option>');
-            $.each(data, function (i, kode) {
-                select.append(`<option value="${kode}" ${selected === kode ? 'selected' : ''}>${kode}</option>`);
-            });
+    // function loadKodeOptions(selected = null) {
+    //     $.get('/apps/sasaran_kinerjas/kode-options', function (data) {
+    //         const select = $('#kode');
+    //         select.empty().append('<option value="">-- Pilih Kode --</option>');
+    //         $.each(data, function (i, kode) {
+    //             select.append(`<option value="${kode}" ${selected === kode ? 'selected' : ''}>${kode}</option>`);
+    //         });
+    //     });
+    // }
+
+    function generateNewCode() {
+        const baseUrl = window.location.origin;
+        fetch(`${baseUrl}/apps/sasaran_kinerjas/last_code`)
+        .then(response => response.json())
+        .then(data => {
+            const lastKode = data.kode;
+            document.getElementById('kode').value = lastKode;
+        })
+        .catch(error => {
+            console.error('Gagal fetch kode baru:', error);
         });
     }
 
@@ -80,13 +100,12 @@ $(document).ready(function () {
         if (id) {
             $.get(`/apps/sasaran_kinerjas/${id}`, function (res) {
                 $('#id').val(res.id);
-                loadKodeOptions(res.kode);
                 $('#kode').val(res.kode);
                 $('#nama').val(res.nama); // <- pastikan ID-nya "nama"
                 $('#sasaranModal').modal('show');
             });
         } else {
-            loadKodeOptions();
+            generateNewCode();
             $('#sasaranModal').modal('show');
         }
     };
