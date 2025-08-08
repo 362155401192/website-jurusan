@@ -85,7 +85,7 @@ $(document).ready(function () {
     // Saat pilih sasaran kinerja
     $('#sasaran_kinerja_id').on('change', function () {
         const sasaranId = $(this).val();
-        if (sasaranId && !$('#id').val()) { // Hanya jika tambah baru, bukan edit
+        if (sasaranId) { // Hanya jika tambah baru, bukan edit
             generateNewCode(sasaranId);
         }
     });

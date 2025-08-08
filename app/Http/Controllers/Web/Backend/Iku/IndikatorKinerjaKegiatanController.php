@@ -65,7 +65,7 @@ class IndikatorKinerjaKegiatanController extends Controller
 
         $indikator = IndikatorKinerjaKegiatan::updateOrCreate(
             ['id' => $request->id],
-            $request->only('kode','year', 'deskripsi', 'sasaran_kinerja_id', 'target_akhir', 'realisasi_akhir', 'program_studi')
+            $request->only('kode', 'year', 'deskripsi', 'sasaran_kinerja_id', 'target_akhir', 'realisasi_akhir', 'program_studi')
         );
 
         return response()->json(['status' => true, 'data' => $indikator]);
@@ -138,26 +138,29 @@ class IndikatorKinerjaKegiatanController extends Controller
         $sasaranId = $request->sasaran_kinerja_id;
 
         $sasaran = SasaranKinerja::findOrFail($sasaranId);
-        $lastIndikator = IndikatorKinerjaKegiatan::where('sasaran_kinerja_id', $sasaranId)
-            ->orderBy('kode', 'desc')
-            ->first();
 
-        if ($lastIndikator) {
-            // Pecah kode "IKU x.y"
-            preg_match('/IKU\s(\d+)\.(\d+)/', $lastIndikator->kode, $matches);
-            $main = $matches[1] ?? 1;
-            $sub = ($matches[2] ?? 0) + 1;
-        } else {
-            // Jika belum ada indikator untuk sasaran ini → mulai dari 1
-            // Misal kode sasaran di database punya "kode" = 1 → IKU 1.1
-            $main = $sasaran->kode;
-            $sub = 1;
+        $mainKode = $sasaran->kode; // misal 'SK1', 'SK2', dll
+
+        // Ambil semua kode indikator untuk sasaran ini
+        $indikators = IndikatorKinerjaKegiatan::where('sasaran_kinerja_id', $sasaranId)->get();
+
+        $maxSub = 0;
+
+        // Regex utk cari "IKU SKx.y" dan ambil angka y (sub)
+        foreach ($indikators as $indikator) {
+            if (preg_match('/IKU\s' . preg_quote($mainKode, '/') . '\.(\d+)/', $indikator->kode, $matches)) {
+                $sub = (int) $matches[1];
+                if ($sub > $maxSub) {
+                    $maxSub = $sub;
+                }
+            }
         }
 
-        $newKode = "IKU {$main}.{$sub}";
+        $newSub = $maxSub + 1;
+        $newKode = "IKU {$mainKode}.{$newSub}";
 
         return response()->json([
-            'kode' => $newKode
+            'kode' => $newKode,
         ]);
     }
 }

@@ -176,7 +176,7 @@
                 </a>
                 <ul class="menu-content">
                     <li>
-                        <a data-toggle="ajax" href="">
+                        <a data-toggle="ajax" href="{{ route('sasaran-kinerja.index')}}">
                             <i class="feather icon-target"></i>
                             <span class="menu-item" data-i18n="SasaranKinerja">Sasaran Kinerja</span>
                         </a>
