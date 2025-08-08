@@ -1,41 +1,67 @@
-// Hindari deklarasi ulang
-if (typeof targetTable === 'undefined') {
-    var targetTable = null;
-}
+$(document).ready(function () {
 
-window.initTargetRealisasi = function () {
-    // Pastikan table hanya diinisialisasi jika elemen ada
-    const $table = $('#targetRealisasiTable');
-    if (!$table.length) return;
+    let groupColumn = 1;
 
-    // Hancurkan DataTable lama jika ada
-    if ($.fn.DataTable.isDataTable('#targetRealisasiTable')) {
-        $table.DataTable().destroy();
-    }
-
-    // Ambil URL dari atribut data-url
-    const ajaxUrl = $table.data('url') || '/apps/target_realisasis/list';
-
-    var groupColumn = 1;
-
-    targetTable = $table.DataTable({
+    var table = $('#targetRealisasiTable').DataTable({
         processing: true,
         serverSide: true,
-        ajax: ajaxUrl,
+        ajax: $('#targetRealisasiTable').data('url'),
         columns: [
-            { data: 'DT_RowIndex', name: 'DT_RowIndex' }, // Sembunyikan indeks jika tidak perlu
-            { data: 'sasaran', name: 'sasaran', visible: false }, // Sembunyikan kolom grouping
-            { data: 'indikator', name: 'indikator' },
-            { data: 'tw1_target', name: 'tw1_target' },
-            { data: 'tw1_realisasi', name: 'tw1_realisasi' },
-            { data: 'tw2_target', name: 'tw2_target' },
-            { data: 'tw2_realisasi', name: 'tw2_realisasi' },
-            { data: 'tw3_target', name: 'tw3_target' },
-            { data: 'tw3_realisasi', name: 'tw3_realisasi' },
-            { data: 'action', name: 'action', orderable: false, searchable: false },
+            {
+                name: 'id',
+                data: null,
+                width: '1%',
+                mRender: function (data, type, row, meta) {
+                    return meta.row + meta.settings._iDisplayStart + 1;
+                }
+            },
+            {
+                data: 'sasaran',
+                name: 'sasaran',
+                visible: false
+            },
+            {
+                data: 'indikator',
+                name: 'indikator'
+            },
+            {
+                data: 'tw1_target',
+                name: 'tw1_target'
+            },
+            {
+                data: 'tw1_realisasi',
+                name: 'tw1_realisasi'
+            },
+            {
+                data: 'tw2_target',
+                name: 'tw2_target'
+            },
+            {
+                data: 'tw2_realisasi',
+                name: 'tw2_realisasi'
+            },
+            {
+                data: 'tw3_target',
+                name: 'tw3_target'
+            },
+            {
+                data: 'tw3_realisasi',
+                name: 'tw3_realisasi',
+            },
+            {
+                name: 'id',
+                data: 'id',
+                width: 150,
+                sortable: false,
+                mRender: function (data, type, row) {
+                    var render = ``
+                    render += `<button class="btn btn-outline-primary btn-sm" type="button" onclick="editRealisasi('${row.kode?.id}')"><i class="feather icon-edit"></i></button> `
+                    render += `<button class="btn btn-outline-danger btn-sm" onclick="deleteData('${row.kode?.indikator_kinerja_kegiatan_id}')"><i class="feather icon-trash-2"></i></button> `;
+                    return render
+                }
+            }
         ],
         order: [[groupColumn, 'asc']],
-        displayLength: 25,
         columnDefs: [
             { visible: false, targets: groupColumn } // sembunyikan kolom 'sasaran'
         ],
@@ -54,94 +80,100 @@ window.initTargetRealisasi = function () {
                     last = group;
                 }
             });
-        },
-
-    });
-
-    // Bind ulang event form submit (hindari duplikat)
-    $('#targetRealisasiForm').off('submit').on('submit', function (e) {
-        e.preventDefault();
-
-        const formData = new FormData(this);
-        const $modal = $('#targetRealisasiModal');
-
-        $.ajax({
-            url: '/apps/target_realisasis',
-            type: 'POST',
-            data: formData,
-            processData: false,
-            contentType: false,
-            success: function () {
-                $modal.modal('hide');
-                if (targetTable) targetTable.ajax.reload();
-                Swal.fire('Berhasil', 'Data berhasil disimpan.', 'success');
-            },
-            error: function (xhr) {
-                const res = xhr.responseJSON;
-                Swal.fire('Error', res?.message || 'Gagal menyimpan data.', 'error');
-            }
-        });
-    });
-
-    // Reset form saat modal ditutup
-    $('#targetRealisasiModal').off('hidden.bs.modal').on('hidden.bs.modal', function () {
-        $('#targetRealisasiForm')[0].reset();
-        $('#id').val('');
-    });
-};
-
-// Show form (edit / create)
-window.showForm = function (id = null) {
-    $('#targetRealisasiForm')[0].reset();
-    $('#id').val('');
-
-    if (id) {
-        $.get(`/apps/target_realisasis/${id}`, function (res) {
-            $('#id').val(res.id);
-            $('#indikator_kinerja_kegiatan_id').val(res.indikator_kinerja_kegiatan_id);
-            $('[name="triwulan"]').val(res.triwulan);
-            $('[name="target"]').val(res.target);
-            $('[name="realisasi"]').val(res.realisasi);
-            $('#targetRealisasiModal').modal('show');
-        });
-    } else {
-        $('#targetRealisasiModal').modal('show');
-    }
-};
-
-// Hapus data
-window.deleteData = function (id) {
-    Swal.fire({
-        title: 'Hapus?',
-        text: "Data yang dihapus tidak dapat dikembalikan!",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonText: 'Ya, hapus',
-        cancelButtonText: 'Batal'
-    }).then((result) => {
-        if (result.isConfirmed) {
-            $.ajax({
-                url: `/apps/target_realisasis/${id}`,
-                type: 'DELETE',
-                data: {
-                    _token: $('meta[name="csrf-token"]').attr('content')
-                },
-                success: function () {
-                    if (targetTable) targetTable.ajax.reload();
-                    Swal.fire('Berhasil', 'Data telah dihapus.', 'success');
-                },
-                error: function () {
-                    Swal.fire('Gagal', 'Terjadi kesalahan saat menghapus data.', 'error');
-                }
-            });
         }
     });
-};
 
-// Inisialisasi otomatis saat HTML dimuat via pushState
-$(document).ready(function () {
-    // Untuk initial load langsung (jika tidak pakai handleView)
-    if ($('#targetRealisasiTable').length) {
-        initTargetRealisasi();
+
+
+    $('.add').on('click', function () {
+        resetInvalid();
+        $("#targetRealisasiForm")[0].reset()
+        $('#realisasiModal .modal-title').html('Tambah Target Realisasi');
+        $('#realisasiModal form').attr('action', `${window.location.href}/store`);
+    });
+
+    window.editRealisasi = function (id) {
+        $('#realisasiModal form').attr('action', `${window.location.origin}/apps/target_realisasis/${id}/update`);
+        $("#targetRealisasiForm")[0].reset()
+        fetch(`${window.location.origin}/apps/target_realisasis/${id}/show`)
+            .then(res => res.json())
+            .then(data => {
+                resetInvalid();
+                $('#realisasiModal .modal-title').html('Edit Staff');
+                $('#indikator_kinerja_kegiatan_id').val(data.indikator_kinerja_kegiatan_id || '');
+                $('select[name="triwulan"]').val(data.triwulan || '');
+                $('input[name="target"]').val(data.target ?? '');
+                $('input[name="realisasi"]').val(data.realisasi ?? '');
+                if (data.file_pendukung) {
+                    $('#filePendukungLabel').text(data.file_pendukung);
+                } else {
+                    $('#filePendukungLabel').text('');
+                }
+                $('#realisasiModal').modal('show');
+            });
+            
+            $('#indikator_kinerja_kegiatan_id, select[name="triwulan"]').on('change', function () {
+                let indikatorId = $('#indikator_kinerja_kegiatan_id').val();
+                let triwulan = $('select[name="triwulan"]').val();
+
+                if (indikatorId && triwulan) {
+                    fetch(`${window.location.origin}/apps/target_realisasis/find?indikator_kinerja_kegiatan_id=${indikatorId}&triwulan=${triwulan}`)
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data) {
+                                $('input[name="target"]').val(data.target ?? '');
+                                $('input[name="realisasi"]').val(data.realisasi ?? '');
+                                if (data.file_pendukung) {
+                                    $('#filePendukungLabel').text(data.file_pendukung);
+                                } else {
+                                    $('#filePendukungLabel').text('');
+                                }
+                                // Update form action jika mau edit data yang sudah ada
+                                $('#realisasiModal form').attr('action', `${window.location.origin}/apps/target_realisasis/${data.id}/update`);
+                            } else {
+                                // Kalau data tidak ada, kosongkan input
+                                $('input[name="target"]').val('');
+                                $('input[name="realisasi"]').val('');
+                                $('#filePendukungLabel').text('');
+                                // Ubah form action ke route create (kalau mau insert baru)
+                                $('#realisasiModal form').attr('action', '{{ route("target-realisasi.store") }}');
+                            }
+                        });
+                }
+            });
     }
+
+
+    window.deleteData = function (id) {
+        Swal.fire({
+            title: 'Hapus?',
+            text: "Data yang dihapus tidak dapat dikembalikan!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Ya, hapus',
+            cancelButtonText: 'Batal',
+            confirmButtonColor: '#fcb040',
+            cancelButtonColor: '#6c757d',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: `/apps/target_realisasis/${id}/delete`,
+                    type: 'DELETE',
+                    data: { _token: $('meta[name="csrf-token"]').attr('content') },
+                    success: function (res) {
+                        if (res.status) {
+                            Swal.fire('Berhasil!', 'Data telah dihapus.', 'success');
+                            table.ajax.reload();
+                        } else {
+                            Swal.fire('Gagal', res.message, 'error');
+                        }
+                    },
+                    error: function () {
+                        Swal.fire('Gagal', 'Terjadi kesalahan saat menghapus data.', 'error');
+                    }
+                });
+            }
+        });
+    };
 });
+

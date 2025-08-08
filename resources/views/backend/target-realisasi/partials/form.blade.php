@@ -1,17 +1,20 @@
-<div class="modal fade" id="targetRealisasiModal" tabindex="-1">
-    <div class="modal-dialog">
-        <form id="targetRealisasiForm" enctype="multipart/form-data">
-            @csrf
-            <input type="hidden" name="id" id="id">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Form Target Realisasi</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
+<div class="modal fade text-left" id="realisasiModal" tabindex="-1" role="dialog" aria-labelledby="realisasiModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="realisasiModalLabel">Tambah Target Realisasi</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form id="targetRealisasiForm" action="{{ route('target-realisasi.store') }}" method="POST" data-request="ajax" data-success-callback="{{ route('target-realisasi.index') }}" enctype="multipart/form-data">
+                @csrf
                 <div class="modal-body">
                     <div class="mb-2">
                         <label>Indikator</label>
-                        <select class="form-control" name="indikator_kinerja_kegiatan_id" id="indikator_kinerja_kegiatan_id" required>
+                        <select class="form-control" name="indikator_kinerja_kegiatan_id"
+                            id="indikator_kinerja_kegiatan_id" required>
                             <option value="">Pilih Indikator</option>
                             @foreach ($indikator as $i)
                                 <option value="{{ $i->id }}">{{ $i->kode }} - {{ $i->deskripsi }}</option>
@@ -36,12 +39,11 @@
                     </div>
                     <div class="mb-2">
                         <label>File Pendukung</label>
-                        <input type="file" name="file_pendukung" class="form-control">
+                        <input type="file" name="file_pendukung" class="form-control dropify" id="dropify">
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="submit" class="btn btn-primary">Simpan</button>
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-primary"><i class="feather icon-send"></i> Simpan</button>
                 </div>
             </div>
         </form>

@@ -176,7 +176,7 @@
                 </a>
                 <ul class="menu-content">
                     <li>
-                        <a data-toggle="ajax" href="sasaran_kinerjas">
+                        <a data-toggle="ajax" href="">
                             <i class="feather icon-target"></i>
                             <span class="menu-item" data-i18n="SasaranKinerja">Sasaran Kinerja</span>
                         </a>
@@ -188,7 +188,7 @@
                         </a>
                     </li>
                     <li>
-                        <a data-toggle="ajax" href="target_realisasis">
+                        <a data-toggle="ajax" href="{{ route('target-realisasi.index')}}">
                             <i class="feather icon-activity"></i>
                             <span class="menu-item" data-i18n="TargetRealisasi">Target Realisasi</span>
                         </a>

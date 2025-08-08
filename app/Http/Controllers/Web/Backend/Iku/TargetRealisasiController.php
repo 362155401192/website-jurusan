@@ -5,7 +5,9 @@ namespace App\Http\Controllers\Web\Backend\Iku;
 use App\Http\Controllers\Controller;
 use App\Models\TargetRealisasi;
 use App\Models\IndikatorKinerjaKegiatan;
+use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Yajra\DataTables\Facades\DataTables;
 
 class TargetRealisasiController extends Controller
@@ -16,61 +18,48 @@ class TargetRealisasiController extends Controller
         $mods = 'target_realisasi'; // untuk load JS custom
 
         $indikator = IndikatorKinerjaKegiatan::with('sasaranKinerja')
-        ->orderBy('kode')
-        ->get();
+            ->orderBy('kode')
+            ->get();
 
         return customView('target-realisasi.index', compact('title', 'mods', 'indikator'), 'backend');
     }
 
 
-    public function list(Request $request)
+    public function getData(Request $request)
     {
-        if ($request->ajax()) {
-            // Ambil semua indikator kinerja yang punya target realisasi
-            $indikators = IndikatorKinerjaKegiatan::with(['sasaranKinerja', 'targetRealisasis'])->get();
+        $query = IndikatorKinerjaKegiatan::with(['sasaranKinerja', 'targetRealisasis'])->get();
+        $query = $query->filter(function ($indikator) {
+            return $indikator->targetRealisasis->isNotEmpty();
+        });
+        $query =  $query->map(function ($indikator, $key) {
+            $triwulan = [
+                1 => ['target' => null, 'realisasi' => null],
+                2 => ['target' => null, 'realisasi' => null],
+                3 => ['target' => null, 'realisasi' => null],
+            ];
 
-            // Bentuk koleksi baru untuk keperluan tampilan datatables horizontal
-            $data = $indikators->map(function ($indikator, $key) {
-                $triwulan = [
-                    1 => ['target' => null, 'realisasi' => null],
-                    2 => ['target' => null, 'realisasi' => null],
-                    3 => ['target' => null, 'realisasi' => null],
+            foreach ($indikator->targetRealisasis as $item) {
+                $tw = (int)$item->triwulan;
+                $triwulan[$tw] = [
+                    'id' => $item->id,
+                    'target' => $item->target,
+                    'realisasi' => $item->realisasi,
                 ];
-
-                foreach ($indikator->targetRealisasis as $item) {
-                    $tw = (int)$item->triwulan;
-                    $triwulan[$tw] = [
-                        'target' => $item->target,
-                        'realisasi' => $item->realisasi,
-                    ];
-                }
-
-                return [
-                    'id' => $indikator->id,
-                    'sasaran' => $indikator->sasaranKinerja->nama ?? '-',
-                    'indikator' => $indikator->deskripsi ?? '-',
-                    'tw1_target' => $triwulan[1]['target'] ?? 0,
-                    'tw1_realisasi' => $triwulan[1]['realisasi'] ?? 0,
-                    'tw2_target' => $triwulan[2]['target'] ?? 0,
-                    'tw2_realisasi' => $triwulan[2]['realisasi'] ?? 0,
-                    'tw3_target' => $triwulan[3]['target'] ?? 0,
-                    'tw3_realisasi' => $triwulan[3]['realisasi'] ?? 0,
-                ];
-            });
-
-            return DataTables::of(collect($data))
-                ->addIndexColumn()
-                ->addColumn('action', function ($row) {
-                    return '
-                    <button class="btn btn-outline-primary btn-sm" onclick="showForm(' . $row['id'] . ')"><i class="feather icon-edit"></i></button>
-                    <button class="btn btn-outline-danger btn-sm" onclick="deleteData(' . $row['id'] . ')"><i class="feather icon-trash-2"></i></button>
-                ';
-                })
-                ->rawColumns(['action'])
-                ->make(true);
-        }
-
-        return abort(403);
+            }
+            return [
+                'id' => $indikator->id,
+                'kode' => $item ?? '-',
+                'sasaran' => $indikator->sasaranKinerja->nama ?? '-',
+                'indikator' => $indikator->deskripsi ?? '-',
+                'tw1_target' => $triwulan[1]['target'] ?? 0,
+                'tw1_realisasi' => $triwulan[1]['realisasi'] ?? 0,
+                'tw2_target' => $triwulan[2]['target'] ?? 0,
+                'tw2_realisasi' => $triwulan[2]['realisasi'] ?? 0,
+                'tw3_target' => $triwulan[3]['target'] ?? 0,
+                'tw3_realisasi' => $triwulan[3]['realisasi'] ?? 0,
+            ];
+        });
+        return DataTables::of($query)->make(true);
     }
 
 
@@ -79,72 +68,120 @@ class TargetRealisasiController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'indikator_kinerja_kegiatan_id' => 'required|exists:indikator_kinerja_kegiatans,id',
-            'triwulan' => 'required|integer|min:1|max:4',
+            'indikator_kinerja_kegiatan_id' => [
+                'required',
+                Rule::unique('target_realisasis')->where(function ($query) use ($request) {
+                    return $query->where('triwulan', $request->triwulan);
+                })
+            ],
+            'triwulan' => [
+                'required',
+                'integer',
+                'min:1',
+                'max:4',
+                Rule::unique('target_realisasis')->where(function ($query) use ($request) {
+                    return $query->where('indikator_kinerja_kegiatan_id', $request->indikator_kinerja_kegiatan_id);
+                })
+            ],
             'target' => 'required|numeric',
             'realisasi' => 'nullable|numeric',
             'file_pendukung' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
         ]);
 
-        // Proses upload file jika ada
         $path = null;
         if ($request->hasFile('file_pendukung')) {
             $path = $request->file('file_pendukung')->store('pendukung', 'public');
         }
 
-        // Simpan data ke database
-        $target = \App\Models\TargetRealisasi::updateOrCreate(
-            [
+        TargetRealisasi::create([
+            'indikator_kinerja_kegiatan_id' => $request->indikator_kinerja_kegiatan_id,
+            'triwulan' => $request->triwulan,
+            'target' => $request->target,
+            'realisasi' => $request->realisasi,
+            'file_pendukung' => $path,
+        ]);
+
+        return response()->json(['message' => 'Data telah ditambahkan']);
+    }
+
+    public function update(Request $request, $id)
+    {
+        $request->validate([
+            'indikator_kinerja_kegiatan_id' => [
+                'required',
+                Rule::unique('target_realisasis')->where(function ($query) use ($request) {
+                    return $query->where('triwulan', $request->triwulan);
+                })->ignore($id)
+            ],
+            'triwulan' => [
+                'required',
+                'integer',
+                'min:1',
+                'max:4',
+                Rule::unique('target_realisasis')->where(function ($query) use ($request) {
+                    return $query->where('indikator_kinerja_kegiatan_id', $request->indikator_kinerja_kegiatan_id);
+                })->ignore($id)
+            ],
+            'target' => 'required|numeric',
+            'realisasi' => 'nullable|numeric',
+            'file_pendukung' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
+        ]);
+
+        try {
+            $target = TargetRealisasi::findOrFail($id);
+
+            $path = null;
+            if ($request->hasFile('file_pendukung')) {
+                $path = $request->file('file_pendukung')->store('pendukung', 'public');
+            } else {
+                $path = $target->file_pendukung;
+            }
+
+            $target->update([
                 'indikator_kinerja_kegiatan_id' => $request->indikator_kinerja_kegiatan_id,
                 'triwulan' => $request->triwulan,
                 'target' => $request->target,
                 'realisasi' => $request->realisasi,
                 'file_pendukung' => $path,
-            ]
-        );
+            ]);
 
-        return response()->json(['status' => true, 'data' => $target]);
+            return response()->json([
+                 'message' => 'Data telah ditambahkan'
+            ]);
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => $e->getMessage(),
+                'trace' => $e->getTrace()
+            ]);
+        }
     }
 
-
-    public function show($id)
+    public function show($id, Request $request)
     {
         $data = TargetRealisasi::findOrFail($id);
         return response()->json($data);
     }
 
+    public function findByIndikatorTriwulan(Request $request)
+    {
+        $indikatorId = $request->input('indikator_kinerja_kegiatan_id');
+        $triwulan = $request->input('triwulan');
+
+        $data = TargetRealisasi::where('indikator_kinerja_kegiatan_id', $indikatorId)
+                ->where('triwulan', $triwulan)
+                ->first();
+
+        return response()->json($data);
+    }
     public function destroy($id)
     {
-        $target = TargetRealisasi::findOrFail($id);
-        $target->delete();
+        $target = TargetRealisasi::where('indikator_kinerja_kegiatan_id',$id)->get();
+        foreach ($target as $item) {
+            $item->delete();
+        }
 
         return response()->json(['status' => true]);
     }
 
-    public function updateInline(Request $request, $id)
-    {
-        $request->validate([
-            'triwulan' => 'required|integer|in:1,2,3',
-            'type' => 'required|in:target,realisasi',
-            'value' => 'required|numeric'
-        ]);
-
-        $indikatorId = $id;
-        $triwulan = $request->input('triwulan');
-        $type = $request->input('type');
-        $value = $request->input('value');
-
-        $target = TargetRealisasi::firstOrNew([
-            'indikator_kinerja_kegiatan_id' => $indikatorId,
-            'triwulan' => $triwulan
-        ]);
-
-        $target->$type = $value;
-        $target->save();
-
-        return response()->json(['success' => true]);
-    }
-
 
 }
-

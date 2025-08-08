@@ -337,8 +337,6 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
             Route::post('', [SettingController::class, 'update'])->middleware('can:update-settings')->name('api.settings');
         });
 
-        // Indikator Kinerja Utama Jurusan
-
         // Route Sasaran Kinerja
         Route::prefix('sasaran_kinerjas')->name('sasaran-kinerja.')->group(function () {
             Route::get('last_code', [SasaranKinerjaController::class, 'lastCode'])->name('lastCode');
@@ -362,15 +360,15 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
         });
 
         // Route Target Realisasi
-        Route::prefix('target_realisasis')->name('target-realisasi.')->group(function () {
-            Route::get('/', [TargetRealisasiController::class, 'index'])->name('index');
-            Route::get('/list', [TargetRealisasiController::class, 'list'])->name('list');
-            Route::get('/{id}', [TargetRealisasiController::class, 'show'])->name('show');
-            Route::post('/', [TargetRealisasiController::class, 'store'])->name('store');
-            Route::put('/{id}', [TargetRealisasiController::class, 'update'])->name('update');
-            Route::delete('/{id}', [TargetRealisasiController::class, 'destroy'])->name('destroy');
+         Route::prefix('target_realisasis')->group(function () {
+            Route::get('', [TargetRealisasiController::class, 'index'])->name('target-realisasi.index');
+            Route::get('get-data', [TargetRealisasiController::class, 'getData'])->name('target-realisasi.get-data');
+            Route::get('{id}/show', [TargetRealisasiController::class, 'show'])->name('target-realisasi.show');
+            Route::get('find', [TargetRealisasiController::class, 'findByIndikatorTriwulan'])->name('target-realisasi.find');
+            Route::post('store', [TargetRealisasiController::class, 'store'])->name('target-realisasi.store');
+            Route::post('{id}/update', [TargetRealisasiController::class, 'update'])->name('target-realisasi.update');
+            Route::delete('{id}/delete', [TargetRealisasiController::class, 'destroy'])->name('target-realisasi.destroy');
         });
-
     });
 });
 

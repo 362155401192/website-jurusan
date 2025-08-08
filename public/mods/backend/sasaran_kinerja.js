@@ -101,7 +101,7 @@ $(document).ready(function () {
             $.get(`/apps/sasaran_kinerjas/${id}`, function (res) {
                 $('#id').val(res.id);
                 $('#kode').val(res.kode);
-                $('#nama').val(res.nama); // <- pastikan ID-nya "nama"
+                $('#nama').val(res.nama);
                 $('#sasaranModal').modal('show');
             });
         } else {
