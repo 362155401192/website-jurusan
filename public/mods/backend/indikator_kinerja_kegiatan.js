@@ -64,19 +64,25 @@ $(document).ready(function () {
         table.ajax.reload(); // Reload datatable dengan data filter baru
     });
 
-    function generateNewCode() {
+    function generateNewCode(sasaranId) {
         const baseUrl = window.location.origin;
-        fetch(`${baseUrl}/apps/indikator_kinerja_kegiatans/last_code`)
+        fetch(`${baseUrl}/apps/indikator_kinerja_kegiatans/last_code?sasaran_kinerja_id=${sasaranId}`)
             .then(response => response.json())
             .then(data => {
-                const lastKode = data.kode;
-                document.getElementById('kode').value = lastKode;
+                document.getElementById('kode').value = data.kode;
             })
             .catch(error => {
                 console.error('Gagal fetch kode baru:', error);
             });
     }
 
+    // Saat pilih sasaran kinerja
+    $('#sasaran_kinerja_id').on('change', function () {
+        const sasaranId = $(this).val();
+        if (sasaranId && !$('#id').val()) { // Hanya jika tambah baru, bukan edit
+            generateNewCode(sasaranId);
+        }
+    });
 
     window.showForm = function (id = null) {
         $('#indikatorForm')[0].reset();
@@ -95,7 +101,6 @@ $(document).ready(function () {
                 $('#indikatorModal').modal('show');
             });
         } else {
-            generateNewCode();
             $('#indikatorModal').modal('show');
         }
     };

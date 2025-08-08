@@ -53,7 +53,7 @@ class IndikatorKinerjaKegiatanController extends Controller
             'target_akhir' => 'nullable|string',
             'realisasi_akhir' => 'nullable|string',
             'program_studi' => 'required|string',
-        ],[
+        ], [
             'kode.unique' => 'Kode sudah digunakan',
         ]);
 
@@ -125,23 +125,28 @@ class IndikatorKinerjaKegiatanController extends Controller
 
     // }
 
-    public function lastCode()
+    public function lastCode(Request $request)
     {
-         $main = 1;
-        $sub = 1;
+        $sasaranId = $request->sasaran_kinerja_id;
 
-        // Loop sampai ketemu kode yang belum ada
-        while (true) {
-            $newKode = "IKU {$main}.{$sub}";
+        $sasaran = SasaranKinerja::findOrFail($sasaranId);
+        $lastIndikator = IndikatorKinerjaKegiatan::where('sasaran_kinerja_id', $sasaranId)
+            ->orderBy('kode', 'desc')
+            ->first();
 
-            $exists = IndikatorKinerjaKegiatan::where('kode', $newKode)->exists();
-
-            if (!$exists) {
-                break;
-            }
-
-            $sub++;
+        if ($lastIndikator) {
+            // Pecah kode "IKU x.y"
+            preg_match('/IKU\s(\d+)\.(\d+)/', $lastIndikator->kode, $matches);
+            $main = $matches[1] ?? 1;
+            $sub = ($matches[2] ?? 0) + 1;
+        } else {
+            // Jika belum ada indikator untuk sasaran ini → mulai dari 1
+            // Misal kode sasaran di database punya "kode" = 1 → IKU 1.1
+            $main = $sasaran->kode;
+            $sub = 1;
         }
+
+        $newKode = "IKU {$main}.{$sub}";
 
         return response()->json([
             'kode' => $newKode
