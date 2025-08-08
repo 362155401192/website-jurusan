@@ -16,7 +16,7 @@
         <div class="card-content">
             <div class="card-body">
                 <div class="row mb-2 align-items-center">
-                    <div class="col-lg-3 col-md-6 col-sm-12 mb-3">
+                    <div class="col-lg-3 col-md-4 col-sm-12 mb-3">
                         <select class="form-control" id="filterProdi">
                             <option value="all">Semua Program Studi</option>
                             <option value="TRPL">TRPL</option>
@@ -24,9 +24,18 @@
                             <option value="BSD">BSD</option>
                         </select>
                     </div>
+                    <div class="col-lg-3 col-md-4 col-sm-12 mb-3">
+                        <select name="tahun" class="form-control" id="filterTahun">
+                            <option selected disabled hidden>Filter Tahun</option>
+                            <option value="all" {{ request('tahun') == 'all' ? 'selected' : '' }}>Semua Tahun</option>
+                            @for ($y = now()->year; $y >= now()->year - 5; $y--)
+                                <option value="{{ $y }}">{{ $y }}</option>
+                            @endfor
+                        </select>
+                    </div>
 
                     <!-- Tombol tambah -->
-                    <div class="col-lg-9 col-md-6 col-sm-12 mb-3 text-right">
+                    <div class="col-lg-6 col-md-4 col-sm-12 mb-3 text-right">
                         <button class="btn btn-primary" onclick="showForm()">Tambah Indikator Kinerja Kegiatan</button>
                     </div>
                 </div>
@@ -40,6 +49,7 @@
                                 <th>Sasaran</th>
                                 <th>Kode</th>
                                 <th>Program Studi</th>
+                                <th>Tahun</th>
                                 <th>Deskripsi</th>
                                 <th>Target Akhir</th>
                                 <th>Realisasi Akhir</th>

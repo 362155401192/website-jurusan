@@ -18,6 +18,7 @@ class IndikatorKinerjaKegiatan extends Model
         'target_akhir',
         'realisasi_akhir',
         'program_studi',
+        'year'
     ];
 
     public function sasaranKinerja()

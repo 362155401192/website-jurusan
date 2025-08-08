@@ -79,7 +79,6 @@ class TargetRealisasiController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'id' => 'nullable|exists:target_realisasis,id',
             'indikator_kinerja_kegiatan_id' => 'required|exists:indikator_kinerja_kegiatans,id',
             'triwulan' => 'required|integer|min:1|max:4',
             'target' => 'required|numeric',
@@ -95,7 +94,6 @@ class TargetRealisasiController extends Controller
 
         // Simpan data ke database
         $target = \App\Models\TargetRealisasi::updateOrCreate(
-            ['id' => $request->id],
             [
                 'indikator_kinerja_kegiatan_id' => $request->indikator_kinerja_kegiatan_id,
                 'triwulan' => $request->triwulan,

@@ -13,6 +13,7 @@ return new class extends Migration
             $table->foreignId('sasaran_kinerja_id')->constrained('sasaran_kinerjas')->onDelete('cascade');
             $table->string('kode');
             $table->text('deskripsi');
+            $table->year('year')->nullable();
             $table->float('target_akhir')->default(0);
             $table->float('realisasi_akhir')->default(0);
             $table->timestamps();

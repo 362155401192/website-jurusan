@@ -20,6 +20,7 @@ $(document).ready(function () {
             type: 'GET',
             data: function (d) {
                 d.program_studi = $('#filterProdi').val(); // Ambil value dari filter
+                d.tahun = $('#filterTahun').val(); // Ambil value dari filter
             }
         },
         columns: [
@@ -27,6 +28,7 @@ $(document).ready(function () {
             { data: 'sasaran', name: 'sasaran' }, // <-- kolom untuk grouping
             { data: 'kode', name: 'kode' },
             { data: 'program_studi', name: 'program_studi' },
+            { data: 'year', name: 'year',defaultContent: '-' },
             { data: 'deskripsi', name: 'deskripsi' },
             { data: 'target_akhir', name: 'target_akhir' },
             { data: 'realisasi_akhir', name: 'realisasi_akhir' },
@@ -51,7 +53,7 @@ $(document).ready(function () {
                 if (last !== group) {
                     $(rows).eq(i).before(
                         `<tr class="group bg-light fw-bold text-dark">
-                        <td colspan="7">Sasaran Kinerja: ${group}</td>
+                        <td colspan="8">Sasaran Kinerja: ${group}</td>
                     </tr>`
                     );
                     last = group;
@@ -61,6 +63,10 @@ $(document).ready(function () {
     });
 
     $('#filterProdi').on('change', function () {
+        table.ajax.reload(); // Reload datatable dengan data filter baru
+    });
+
+    $('#filterTahun').on('change', function () {
         table.ajax.reload(); // Reload datatable dengan data filter baru
     });
 
@@ -95,6 +101,7 @@ $(document).ready(function () {
                 $('#kode').val(res.kode);
                 $('#program_studi').val(res.program_studi);
                 $('#deskripsi').val(res.deskripsi);
+                $('#year').val(res.year);
                 $('#target_akhir').val(res.target_akhir);
                 $('#realisasi_akhir').val(res.realisasi_akhir);
                 $('#sasaran_kinerja_id').val(res.sasaran_kinerja_id);

@@ -12,18 +12,22 @@
                 <div class="modal-body">
                     <input type="hidden" name="id" id="id">
                     <div class="row g-3">
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <label for="kode">Kode</label>
                             <input type="text" name="kode" id="kode" class="form-control" readonly>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <label for="program_studi" class="form-label">Program Studi</label>
                             <select name="program_studi" id="program_studi" class="form-control" required>
                                 <option value="">-- Pilih Program Studi --</option>
-                                <option value="TRPL" {}>TRPL</option>
+                                <option value="TRPL">TRPL</option>
                                 <option value="TRK">TRK</option>
                                 <option value="BSD">BSD</option>
                             </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="year">Tahun</label>
+                            <input type="year" name="year" id="year" class="form-control" autocomplete="off" required>
                         </div>
 
                         <div class="col-md-12">

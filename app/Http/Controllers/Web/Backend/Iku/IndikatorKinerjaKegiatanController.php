@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Web\Backend\Iku;
 use App\Http\Controllers\Controller;
 use App\Models\SasaranKinerja;
 use App\Models\IndikatorKinerjaKegiatan;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\Validator;
@@ -22,10 +23,14 @@ class IndikatorKinerjaKegiatanController extends Controller
     public function list(Request $request)
     {
         if ($request->ajax()) {
-            $query = IndikatorKinerjaKegiatan::with('sasaranKinerja')->orderBy('kode');
+            $query = IndikatorKinerjaKegiatan::with(['sasaranKinerja'])->orderBy('kode');
 
             if ($request->has('program_studi') && $request->program_studi != 'all') {
                 $query->where('program_studi', $request->program_studi);
+            }
+
+            if ($request->has('tahun') && $request->tahun && $request->tahun != 'all') {
+                $query->where('year', $request->tahun);
             }
 
             return DataTables::of($query)
@@ -53,13 +58,14 @@ class IndikatorKinerjaKegiatanController extends Controller
             'target_akhir' => 'nullable|string',
             'realisasi_akhir' => 'nullable|string',
             'program_studi' => 'required|string',
+            'year' => 'required',
         ], [
             'kode.unique' => 'Kode sudah digunakan',
         ]);
 
         $indikator = IndikatorKinerjaKegiatan::updateOrCreate(
             ['id' => $request->id],
-            $request->only('kode', 'deskripsi', 'sasaran_kinerja_id', 'target_akhir', 'realisasi_akhir', 'program_studi')
+            $request->only('kode','year', 'deskripsi', 'sasaran_kinerja_id', 'target_akhir', 'realisasi_akhir', 'program_studi')
         );
 
         return response()->json(['status' => true, 'data' => $indikator]);
@@ -74,6 +80,7 @@ class IndikatorKinerjaKegiatanController extends Controller
             'target_akhir' => 'nullable|string',
             'realisasi_akhir' => 'nullable|string',
             'program_studi' => 'required|string',
+            'year' => 'required',
         ]);
 
         $indikator = IndikatorKinerjaKegiatan::findOrFail($id);
@@ -84,7 +91,8 @@ class IndikatorKinerjaKegiatanController extends Controller
             'sasaran_kinerja_id',
             'target_akhir',
             'realisasi_akhir',
-            'program_studi'
+            'program_studi',
+            'year'
         ));
 
         return response()->json(['status' => true, 'data' => $indikator]);
