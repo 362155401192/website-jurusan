@@ -39,6 +39,7 @@ class TargetRealisasiController extends Controller
             ];
 
             foreach ($indikator->targetRealisasis as $item) {
+                // dd($item);
                 $tw = (int)$item->triwulan;
                 $triwulan[$tw] = [
                     'id' => $item->id,
@@ -104,50 +105,92 @@ class TargetRealisasiController extends Controller
         return response()->json(['message' => 'Data telah ditambahkan']);
     }
 
-    public function update(Request $request, $id)
+    // public function update(Request $request, $id)
+    // {
+    //     $request->validate([
+    //         'indikator_kinerja_kegiatan_id' => [
+    //             'required',
+    //             Rule::unique('target_realisasis')->where(function ($query) use ($request) {
+    //                 return $query->where('triwulan', $request->triwulan);
+    //             })->ignore($id)
+    //         ],
+    //         'triwulan' => [
+    //             'required',
+    //             'integer',
+    //             'min:1',
+    //             'max:4',
+    //             Rule::unique('target_realisasis')->where(function ($query) use ($request) {
+    //                 return $query->where('indikator_kinerja_kegiatan_id', $request->indikator_kinerja_kegiatan_id);
+    //             })->ignore($id)
+    //         ],
+    //         'target' => 'required|numeric',
+    //         'realisasi' => 'nullable|numeric',
+    //         'file_pendukung' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
+    //     ]);
+
+    //     try {
+    //         $target = TargetRealisasi::findOrFail($id);
+
+    //         $path = null;
+    //         if ($request->hasFile('file_pendukung')) {
+    //             $path = $request->file('file_pendukung')->store('pendukung', 'public');
+    //         } else {
+    //             $path = $target->file_pendukung;
+    //         }
+
+    //         $target->update([
+    //             'indikator_kinerja_kegiatan_id' => $request->indikator_kinerja_kegiatan_id,
+    //             'triwulan' => $request->triwulan,
+    //             'target' => $request->target,
+    //             'realisasi' => $request->realisasi,
+    //             'file_pendukung' => $path,
+    //         ]);
+
+    //         return response()->json([
+    //              'message' => 'Data telah ditambahkan'
+    //         ]);
+    //     } catch (Exception $e) {
+    //         return response()->json([
+    //             'message' => $e->getMessage(),
+    //             'trace' => $e->getTrace()
+    //         ]);
+    //     }
+    // }
+
+    public function  update(Request $request, $indikatorId, $triwulan)
     {
-        $request->validate([
-            'indikator_kinerja_kegiatan_id' => [
-                'required',
-                Rule::unique('target_realisasis')->where(function ($query) use ($request) {
-                    return $query->where('triwulan', $request->triwulan);
-                })->ignore($id)
-            ],
-            'triwulan' => [
-                'required',
-                'integer',
-                'min:1',
-                'max:4',
-                Rule::unique('target_realisasis')->where(function ($query) use ($request) {
-                    return $query->where('indikator_kinerja_kegiatan_id', $request->indikator_kinerja_kegiatan_id);
-                })->ignore($id)
-            ],
-            'target' => 'required|numeric',
-            'realisasi' => 'nullable|numeric',
-            'file_pendukung' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
+       $request->validate([
+            'field' => 'required|in:target,realisasi',
+            'value' => 'nullable|numeric'
         ]);
 
         try {
-            $target = TargetRealisasi::findOrFail($id);
+            $currentMonth = now()->month;
+            if ($request->field === 'realisasi') {
+                $allowedMonths = [
+                    1 => [1, 2, 3, 4],   // triwulan 1
+                    2 => [5, 6, 7, 8],   // triwulan 2
+                    3 => [9, 10, 11, 12] // triwulan 3
+                ];
 
-            $path = null;
-            if ($request->hasFile('file_pendukung')) {
-                $path = $request->file('file_pendukung')->store('pendukung', 'public');
-            } else {
-                $path = $target->file_pendukung;
+                if (!in_array($currentMonth, $allowedMonths[$triwulan])) {
+                    return response()->json([
+                        'message' => 'Perubahan realisasi tidak diizinkan pada bulan ini.'
+                    ], 422);
+                }
             }
-
-            $target->update([
-                'indikator_kinerja_kegiatan_id' => $request->indikator_kinerja_kegiatan_id,
-                'triwulan' => $request->triwulan,
-                'target' => $request->target,
-                'realisasi' => $request->realisasi,
-                'file_pendukung' => $path,
+            $target = TargetRealisasi::firstOrNew([
+                'indikator_kinerja_kegiatan_id' => $indikatorId,
+                'triwulan' => $triwulan,
+                'tahun' => now()->year
             ]);
+            $target->{$request->field} = $request->value;
+            $target->save();
 
             return response()->json([
-                 'message' => 'Data telah ditambahkan'
-            ]);
+                'message' => 'Data telah diubah',
+                'status' => true,
+            ], 200);
         } catch (Exception $e) {
             return response()->json([
                 'message' => $e->getMessage(),
@@ -168,20 +211,18 @@ class TargetRealisasiController extends Controller
         $triwulan = $request->input('triwulan');
 
         $data = TargetRealisasi::where('indikator_kinerja_kegiatan_id', $indikatorId)
-                ->where('triwulan', $triwulan)
-                ->first();
+            ->where('triwulan', $triwulan)
+            ->first();
 
         return response()->json($data);
     }
     public function destroy($id)
     {
-        $target = TargetRealisasi::where('indikator_kinerja_kegiatan_id',$id)->get();
+        $target = TargetRealisasi::where('indikator_kinerja_kegiatan_id', $id)->get();
         foreach ($target as $item) {
             $item->delete();
         }
 
         return response()->json(['status' => true]);
     }
-
-
 }

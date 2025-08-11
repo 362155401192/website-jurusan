@@ -366,7 +366,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
             Route::get('{id}/show', [TargetRealisasiController::class, 'show'])->name('target-realisasi.show');
             Route::get('find', [TargetRealisasiController::class, 'findByIndikatorTriwulan'])->name('target-realisasi.find');
             Route::post('store', [TargetRealisasiController::class, 'store'])->name('target-realisasi.store');
-            Route::post('{id}/update', [TargetRealisasiController::class, 'update'])->name('target-realisasi.update');
+            Route::post('{indikatorId}/{triwulan}/update', [TargetRealisasiController::class, 'update'])->name('target-realisasi.update');
             Route::delete('{id}/delete', [TargetRealisasiController::class, 'destroy'])->name('target-realisasi.destroy');
         });
     });
