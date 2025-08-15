@@ -42,9 +42,10 @@
                         onchange="this.form.submit()">
                         <option selected disabled hidden>Filter program studi</option>
                         <option value="all" {{ request('prodi') == 'all' ? 'selected' : '' }}>Semua Prodi</option>
-                        <option value="TRPL" {{ request('prodi') == 'TRPL' ? 'selected' : '' }}>TRPL</option>
-                        <option value="TRK" {{ request('prodi') == 'TRK' ? 'selected' : '' }}>TRK</option>
-                        <option value="BSD" {{ request('prodi') == 'BSD' ? 'selected' : '' }}>BSD</option>
+                        @foreach ($programStudi as $item)
+                            <option value="{{ $item->id }}" {{ request('prodi') == $item->id ? 'selected' : '' }}>
+                                {{ $item->name }}</option>
+                        @endforeach
                     </select>
                 </div>
 
@@ -92,7 +93,9 @@
                                     return $indikator;
                                 });
                             })
-                            ->groupBy('program_studi');
+                             ->groupBy(function ($indikator) {
+                                return $indikator->programStudi->name ?? 'Tanpa Program Studi';
+                            });
                     @endphp
                     @php $no = 1; @endphp
                     @foreach ($grouped as $programStudi => $indikators)

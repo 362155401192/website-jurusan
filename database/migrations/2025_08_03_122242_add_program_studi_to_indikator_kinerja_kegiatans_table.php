@@ -13,9 +13,9 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::table('indikator_kinerja_kegiatans', function (Blueprint $table) {
-            $table->string('program_studi')->nullable()->after('sasaran_kinerja_id');
-        });
+        // Schema::table('indikator_kinerja_kegiatans', function (Blueprint $table) {
+        //     $table->string('program_studi_id')->nullable()->after('sasaran_kinerja_id');
+        // });
     }
 
     /**
@@ -25,8 +25,8 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::table('indikator_kinerja_kegiatans', function (Blueprint $table) {
-            $table->dropColumn('program_studi');
-        });
+        // Schema::table('indikator_kinerja_kegiatans', function (Blueprint $table) {
+        //     $table->dropColumn('program_studi');
+        // });
     }
 };

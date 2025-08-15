@@ -23,6 +23,14 @@ class RoleSeeder extends Seeder
             'name' => 'Administrator',
             'is_default' => false
         ]);
+        $kaprodi = Role::create([
+            'name' => 'Kaprodi',
+            'is_default' => false
+        ]);
+        $dosen = Role::create([
+            'name' => 'Dosen',
+            'is_default' => false
+        ]);
 
         // Give permission to role
         $developer->givePermissionTo([
@@ -83,6 +91,17 @@ class RoleSeeder extends Seeder
             'read-sasaran-kinerjas', 'create-sasaran-kinerjas', 'update-sasaran-kinerjas', 'delete-sasaran-kinerjas',
             'read-indikator-kinerja-kegiatans', 'create-indikator-kinerja-kegiatans', 'update-indikator-kinerja-kegiatans', 'delete-indikator-kinerja-kegiatans',
             'read-target-realisasis', 'create-target-realisasis', 'update-target-realisasis', 'delete-target-realisasis',
+        ]);
+
+        $kaprodi->givePermissionTo([
+            'read-dashboards',
+            'read-sasaran-kinerjas', 'create-sasaran-kinerjas', 'update-sasaran-kinerjas', 'delete-sasaran-kinerjas',
+            'read-indikator-kinerja-kegiatans', 'create-indikator-kinerja-kegiatans', 'update-indikator-kinerja-kegiatans', 'delete-indikator-kinerja-kegiatans',
+            'read-target-realisasis', 'create-target-realisasis', 'update-target-realisasis', 'delete-target-realisasis',
+        ]);
+
+        $dosen->givePermissionTo([
+            'read-dashboards',
         ]);
     }
 }

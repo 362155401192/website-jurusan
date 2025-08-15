@@ -19,7 +19,7 @@ $(document).ready(function () {
             url: '/apps/indikator_kinerja_kegiatans/list',
             type: 'GET',
             data: function (d) {
-                d.program_studi = $('#filterProdi').val(); // Ambil value dari filter
+                d.program_studi_id = $('#filterProdi').val(); // Ambil value dari filter
                 d.tahun = $('#filterTahun').val(); // Ambil value dari filter
             }
         },
@@ -27,7 +27,20 @@ $(document).ready(function () {
             { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false },
             { data: 'sasaran', name: 'sasaran' }, // <-- kolom untuk grouping
             { data: 'kode', name: 'kode' },
-            { data: 'program_studi', name: 'program_studi' },
+            {
+                data: 'program_studi_id',
+                name: 'program_studi_id',
+               render: function (data, type, row) {
+                    if (row.program_studi?.name) {
+                        return row.program_studi.name
+                            .split(' ')                 // Pisah per kata
+                            .map(word => word.charAt(0)) // Ambil huruf pertama tiap kata
+                            .join('')                    // Gabung jadi string
+                            .toUpperCase();               // Jadi huruf besar
+                    }
+                    return '-';
+                }
+            },
             { data: 'year', name: 'year',defaultContent: '-' },
             { data: 'deskripsi', name: 'deskripsi' },
             { data: 'target_akhir', name: 'target_akhir' },
@@ -63,7 +76,7 @@ $(document).ready(function () {
     });
 
     $('#filterProdi').on('change', function () {
-        table.ajax.reload(); // Reload datatable dengan data filter baru
+        table.ajax.reload();
     });
 
     $('#filterTahun').on('change', function () {
@@ -99,7 +112,7 @@ $(document).ready(function () {
             $.get(`/apps/indikator_kinerja_kegiatans/${id}`, function (res) {
                 $('#id').val(res.id);
                 $('#kode').val(res.kode);
-                $('#program_studi').val(res.program_studi);
+                $('#program_studi_id').val(res.program_studi_id);
                 $('#deskripsi').val(res.deskripsi);
                 $('#year').val(res.year);
                 $('#target_akhir').val(res.target_akhir);

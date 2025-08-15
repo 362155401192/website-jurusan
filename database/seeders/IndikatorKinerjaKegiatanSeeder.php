@@ -27,7 +27,7 @@ class IndikatorKinerjaKegiatanSeeder extends Seeder
             ],
         ];
 
-        $programStudis = ['TRPL', 'TRK', 'BSD'];
+        $programStudis = [1,2,3];
 
         foreach (SasaranKinerja::all() as $sasaran) {
             $counter = 0;
@@ -39,7 +39,7 @@ class IndikatorKinerjaKegiatanSeeder extends Seeder
                     'deskripsi' => $item['deskripsi'],
                     'target_akhir' => rand(80, 100),
                     'realisasi_akhir' => rand(70, 100),
-                    'program_studi' => $programStudis[$counter++ % count($programStudis)],
+                    'program_studi_id' => $programStudis[$counter++ % count($programStudis)],
                 ]);
             }
         }

@@ -3,8 +3,10 @@
 namespace Database\Seeders;
 
 use App\Models\Employee;
+use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
 
 class EmployeeSeeder extends Seeder
 {
@@ -15,12 +17,13 @@ class EmployeeSeeder extends Seeder
      */
     public function run()
     {
-         Employee::insert([
-            [
+
+        $employees = [
+
+             [
                 'employee_type_id' => 1,
                 'employee_status_id' => 1,
                 'employee_program_studi_id' => 1,
-                'user_id' => 1,
                 'identity_number' => '197506252021211003',
                 'slug' => 'subono-s-t-m-t',
                 'name' => 'Subono, S.T.,M.T',
@@ -31,13 +34,12 @@ class EmployeeSeeder extends Seeder
                 'phone_number'=> '087859576210',
                 'address'=> 'Jl. Bunga Kumis Kucing no. 20 Rt/Rw 004/002 Jatimulyo - Lowokwaru Malang 65141',
                 "id_sdm" => "cf7bb033-168b-4507-8c5d-7dacc57d5b73",
-
+                'role' => 'Dosen',
             ],
             [
                 'employee_type_id' => 1,
                 'employee_status_id' => 1,
                 'employee_program_studi_id' => 2,
-                'user_id' => 1,
                 'identity_number' => '197509272021211002',
                 'slug' => 'herman-yuliandoko-s-t-m-t',
                 'name' => 'Herman Yuliandoko, S.T.,M.T',
@@ -48,12 +50,12 @@ class EmployeeSeeder extends Seeder
                 'phone_number'=> '081 334 436 478',
                 'address'=> 'Perum Citra Garden Blok F1, Lemahbang Dewo, Rogojampi',
                 "id_sdm" => "86ca7be5-6aa7-4c13-b195-14670f3db7f3",
+                'role' => 'Dosen',
             ],
             [
                 'employee_type_id' => 1,
                 'employee_status_id' => 1,
                 'employee_program_studi_id' => 1,
-                'user_id' => 1,
                 'identity_number' => '197601222021211001',
                 'slug' => 'mohamad-dimyati-ayatullah-s-t-m-kom',
                 'name' => 'Mohamad Dimyati Ayatullah, S.T.,M.Kom',
@@ -64,12 +66,12 @@ class EmployeeSeeder extends Seeder
                 'phone_number'=> '081 233 991 84',
                 'address'=> 'Dusun Kraja 001/001 Sumbersari - Srono Banyuwangi 68471',
                 "id_sdm" => "12c99923-e00e-48f2-869a-da35dd29123c",
+                'role' => 'Dosen',
             ],
             [
                 'employee_type_id' => 1,
                 'employee_status_id' => 1,
                 'employee_program_studi_id' => 3,
-                'user_id' => 1,
                 'identity_number' => '197704042021211004',
                 'slug' => 'dedy-hidayat-kusuma-s-t-m-cs',
                 'name' => 'Dedy Hidayat Kusuma, S.T.,M.Cs',
@@ -80,12 +82,12 @@ class EmployeeSeeder extends Seeder
                 'phone_number'=> '087755527517',
                 'address'=> 'Sumber Kepuh Rt/Rw 003/001 Kedungwungu - Tegaldlimo Banyuwangi 68484',
                 "id_sdm" => "04cd36ec-14eb-42af-8cdb-339f4d24737e",
+                'role' => 'Dosen',
             ],
             [
                 'employee_type_id' => 1,
                 'employee_status_id' => 1,
                 'employee_program_studi_id' => 2,
-                'user_id' => 1,
                 'identity_number' => '197806132014041001',
                 'slug' => 'muhammad-fuad-alharis-s-t-m-t',
                 'name' => 'Muhammad Fuad Alharis, S.T.,M.T',
@@ -96,12 +98,12 @@ class EmployeeSeeder extends Seeder
                 'phone_number'=> '081 234 619 898',
                 'address'=> 'Perum Brawijaya Regency Jl. Basuki Rahmat Gg.Mangga No.12 Rt/Rw 002/004 Lateng - Banyuwangi 68413',
                 "id_sdm" => "0475fc50-9240-4689-8cac-9598a689ed49",
+                'role' => 'Dosen',
             ],
             [
                 'employee_type_id' => 1,
                 'employee_status_id' => 1,
                 'employee_program_studi_id' => 1,
-                'user_id' => 1,
                 'identity_number' => '198010222015041001',
                 'slug' => 'i-wayan-suardinata-s-kom-m-kot',
                 'name' => 'I Wayan Suardinata, S.Kom.,M.T',
@@ -112,12 +114,12 @@ class EmployeeSeeder extends Seeder
                 'phone_number'=> '085736577864',
                 'address'=> 'Jalan Prabu loro 525A Kelurahan Bakungan kecamtan Glagah',
                 "id_sdm" => "a5508e4a-7c84-4030-930a-e0026a484ba9",
+                'role' => 'Dosen',
             ],
             [
                 'employee_type_id' => 1,
                 'employee_status_id' => 1,
                 'employee_program_studi_id' => 2,
-                'user_id' => 1,
                 'identity_number' => '198301192021211006',
                 'slug' => 'moh-nur-shodiq-s-t-m-t',
                 'name' => 'Moh. Nur Shodiq, S.T.,M.T',
@@ -128,12 +130,12 @@ class EmployeeSeeder extends Seeder
                 'phone_number'=> '085 236 675 444',
                 'address'=> 'Kampungtimur 001/004 Trigonco - Asembagus Situbondo 68373',
                 "id_sdm" => "8a873502-fa06-4e31-a697-6de9906a0fc1",
+                'role' => 'Dosen',
             ],
             [
                 'employee_type_id' => 1,
                 'employee_status_id' => 1,
                 'employee_program_studi_id' => 3,
-                'user_id' => 1,
                 'identity_number' => '198310202014042001',
                 'slug' => 'eka-mistiko-rini-s-kom-m-kom',
                 'name' => 'Eka Mistiko Rini, S.Kom.,M.Kom',
@@ -144,12 +146,12 @@ class EmployeeSeeder extends Seeder
                 'phone_number'=> '081 913 922 224',
                 'address'=> 'Dusun WatuUlo Rt/Rw 004/002 Rejosari - Glagah Banyuwangi 68432',
                 "id_sdm" => "51721c9b-fe38-468f-a496-4ae9280b1bd5",
+                'role' => 'Dosen',
             ],
             [
                 'employee_type_id' => 1,
                 'employee_status_id' => 1,
                 'employee_program_studi_id' => 1,
-                'user_id' => 1,
                 'identity_number' => '198311052015041001',
                 'slug' => 'devit-suwardiyanto-s-si-m-t',
                 'name' => 'Devit Suwardiyanto, S.Si.,M.T',
@@ -160,12 +162,12 @@ class EmployeeSeeder extends Seeder
                 'phone_number'=> '081 135 706 83',
                 'address'=> 'Perum Mendut Hijau Blok F No 3, Tamanbaru, Banyuwangi',
                 "id_sdm" => "cb4b79bc-162e-4ead-b339-4d35288cf37a",
+                'role' => 'Dosen',
             ],
             [
                 'employee_type_id' => 1,
                 'employee_status_id' => 1,
                 'employee_program_studi_id' => 1,
-                'user_id' => 1,
                 'identity_number' => '198403052021212004',
                 'slug' => 'dianni-yusuf-s-kom-m-kom',
                 'name' => 'Dianni Yusuf, S.Kom.,M.Kom',
@@ -176,12 +178,12 @@ class EmployeeSeeder extends Seeder
                 'phone_number'=> '082328333399',
                 'address'=> 'Dsn. Gembolo Rt/Rw 01/01 Purwodadi - Gambiran Banyuwangi 68486',
                 "id_sdm" => "5a386c83-63f5-46a2-8bca-0b94104b0324",
+                'role' => 'Kaprodi',
             ],
             [
                 'employee_type_id' => 1,
                 'employee_status_id' => 1,
                 'employee_program_studi_id' => 1,
-                'user_id' => 1,
                 'identity_number' => '198403112019031005',
                 'slug' => 'endi-sailul-haq-s-t-m-kom',
                 'name' => 'Endi Sailul Haq, S.T.,M.Kom',
@@ -192,12 +194,12 @@ class EmployeeSeeder extends Seeder
                 'phone_number'=> '081 336 851 513',
                 'address'=> 'Dusun Kebonrejo Rt/Rw 003/001 Alasrejo Wongsorejo - Banyuwangi 68453',
                 "id_sdm" => "269ecb19-0475-414f-ab68-dce1abd719f9",
+                'role' => 'Dosen',
             ],
             [
                 'employee_type_id' => 1,
                 'employee_status_id' => 1,
                 'employee_program_studi_id' => 1,
-                'user_id' => 1,
                 'identity_number' => '198404032019032012',
                 'slug' => 'vivien-arief-wardhany-s-t-m-t',
                 'name' => 'Vivien Arief Wardhany, S.T.,M.T',
@@ -208,12 +210,12 @@ class EmployeeSeeder extends Seeder
                 'phone_number'=> '0813-3106-8658',
                 'address'=> 'Perum Citra Garden Blok C-20, Dusun Satriyan 002/004 Lemahbangdewo Rogojampi - Banyuwangi 68462',
                 "id_sdm" => "d8722444-05af-459f-838d-6d905af81770",
+                'role' => 'Dosen',
             ],
             [
                 'employee_type_id' => 1,
                 'employee_status_id' => 1,
                 'employee_program_studi_id' => 1,
-                'user_id' => 1,
                 'identity_number' => '2013.36.106',
                 'slug' => 'farizqi-panduardi-s-st-m-t',
                 'name' => 'Farizqi Panduardi, S.ST.,M.T',
@@ -224,12 +226,12 @@ class EmployeeSeeder extends Seeder
                 'phone_number'=> '082244680800',
                 'address'=> 'Jl.S.Parman 33 Gardenia Estate G97',
                 "id_sdm" => "d2d07dff-8838-489f-9c2e-b9909717280",
+                'role' => 'Dosen',
             ],
             [
                 'employee_type_id' => 1,
                 'employee_status_id' => 1,
                 'employee_program_studi_id' => 1,
-                'user_id' => 1,
                 'identity_number' => '199004192018031001',
                 'slug' => 'junaedi-adi-prasetyo-s-st-m-sc',
                 'name' => 'Junaedi Adi Prasetyo, S.ST.,M.Sc',
@@ -240,12 +242,12 @@ class EmployeeSeeder extends Seeder
                 'phone_number'=> '082333312244',
                 'address'=> 'Jl. Tirtosari Blok D No 12 Landungsari Malang 65151',
                 "id_sdm" => "a8e1bc04-962f-4788-9651-bf573039e3f2",
+                'role' => 'Dosen',
             ],
             [
                 'employee_type_id' => 1,
                 'employee_status_id' => 1,
                 'employee_program_studi_id' => 1,
-                'user_id' => 1,
                 'identity_number' => '199009052019031024',
                 'slug' => 'sepyan-purnama-kristanto-s-kom-m-kom',
                 'name' => 'Sepyan Purnama Kristanto, S.Kom.,M.Kom',
@@ -256,12 +258,12 @@ class EmployeeSeeder extends Seeder
                 'phone_number'=> '085237516017',
                 'address'=> 'Jl. Temuguruh Rt.03 Rw.01 Resomulyo  Banyuwangi',
                 "id_sdm" => "c06c52e8-2d24-4417-898d-1b43fe7eb08f",
+                'role' => 'Dosen',
             ],
             [
                 'employee_type_id' => 1,
                 'employee_status_id' => 1,
                 'employee_program_studi_id' => 1,
-                'user_id' => 1,
                 'identity_number' => '199010052014041002',
                 'slug' => 'alfin-hidayat-s-t-m-t',
                 'name' => 'Alfin Hidayat, S.T.,M.T',
@@ -272,12 +274,12 @@ class EmployeeSeeder extends Seeder
                 'phone_number'=> '085731147608',
                 'address'=> 'Dsn.Krajan 02/01 Blambangan - Muncar Banyuwangi 68472',
                 "id_sdm" => "411b2d24-24ad-4968-9caf-fb8a51656956",
+                'role' => 'Dosen',
             ],
             [
                 'employee_type_id' => 1,
                 'employee_status_id' => 1,
                 'employee_program_studi_id' => 1,
-                'user_id' => 1,
                 'identity_number' => '199104202018031002',
                 'slug' => 'alif-akbar-fitriawan-s-pd-m-kom',
                 'name' => 'Alif Akbar Fitrawan, S.Pd.,M.Kom',
@@ -288,12 +290,12 @@ class EmployeeSeeder extends Seeder
                 'phone_number'=> '085646421106',
                 'address'=> 'Perumahan Pengantigan Indah Blok BC-02 Rogojampi',
                 "id_sdm" => "",
+                'role' => 'Dosen',
             ],
             [
                 'employee_type_id' => 1,
                 'employee_status_id' => 1,
                 'employee_program_studi_id' => 1,
-                'user_id' => 1,
                 'identity_number' => '199203302019031012',
                 'slug' => 'lutfi-hakim-s-pd-m-t',
                 'name' => 'Lutfi Hakim, S.Pd.,M.T',
@@ -304,12 +306,12 @@ class EmployeeSeeder extends Seeder
                 'phone_number'=> '085330161514',
                 'address'=> 'Jl, kepodang no 11 Rw 1rw 2kalirejo kabat banyuwangi',
                 "id_sdm" => "0e60a0f1-d57c-4a95-8b6f-323f78edb607",
+                'role' => 'Dosen',
             ],
             [
                 'employee_type_id' => 1,
                 'employee_status_id' => 1,
                 'employee_program_studi_id' => 1,
-                'user_id' => 1,
                 'identity_number' => '2010.36.048',
                 'slug' => 'agus-priyo-utomo-s-st-mtr-kom',
                 'name' => 'Agus Priyo Utomo, S.ST.,M.Tr.Kom',
@@ -320,12 +322,12 @@ class EmployeeSeeder extends Seeder
                 'phone_number'=> '085 731 311 399',
                 'address'=> 'Jl. RW Monginsidi 14 - Banyuwangi 68416',
                 "id_sdm" => "fa32bd47-822a-494f-85a1-44413ecb3b11",
+                'role' => 'Dosen',
             ],
             [
                 'employee_type_id' => 1,
                 'employee_status_id' => 1,
                 'employee_program_studi_id' => 1,
-                'user_id' => 1,
                 'identity_number' => '199202272020122019',
                 'slug' => 'ruth-ema-febrita-s-pd-m-kom',
                 'name' => 'Ruth Ema Febrita, S.Pd.,M.Kom',
@@ -336,12 +338,12 @@ class EmployeeSeeder extends Seeder
                 'phone_number'=> '085259082627',
                 'address'=> 'Jl. Jaksa Agusng Suprapto, gg Annur 1  no 25 B pengajuran Banywuangi',
                 "id_sdm" => "19c4ad0b-7e36-49ab-9d15-0c6d85134b6f",
+                'role' => 'Dosen',
             ],
             [
                 'employee_type_id' => 1,
                 'employee_status_id' => 1,
                 'employee_program_studi_id' => 1,
-                'user_id' => 1,
                 'identity_number' => '2018.36.214',
                 'slug' => 'galih-hendra-wibowo-s-tr-kom-m-t',
                 'name' => 'Galih Hendra Wibowo, S.Tr.Kom.,M.T',
@@ -352,12 +354,12 @@ class EmployeeSeeder extends Seeder
                 'phone_number'=> '083831120642',
                 'address'=> 'Surabaya, Jl Ahmad 3 No.15 Rt.01 RW.10 Pepe Legi Waru Sidoarjo',
                 "id_sdm" => "6ea6b6c8-4b6b-4d76-8cf4-45e557cada6f",
+                'role' => 'Dosen',
             ],
             [
                 'employee_type_id' => 1,
                 'employee_status_id' => 1,
                 'employee_program_studi_id' => 1,
-                'user_id' => 1,
                 'identity_number' => '199209212020122021',
                 'slug' => 'arum-randary-ratri-s-si-m-si',
                 'name' => 'Arum Andary Ratri, S.Si.,M.Si',
@@ -368,12 +370,12 @@ class EmployeeSeeder extends Seeder
                 'phone_number'=> '083117703473',
                 'address'=> 'Dusun Krajan Barat Rt 1 Rw 1, Desa Singonjuruh Kecamatan Singonjuruh',
                 "id_sdm" => "cff56fc8-6bd0-47fb-b8b1-6eda97249966",
+                'role' => 'Dosen',
             ],
             [
                 'employee_type_id' => 1,
                 'employee_status_id' => 1,
                 'employee_program_studi_id' => 1,
-                'user_id' => 1,
                 'identity_number' => '2021.36.248',
                 'slug' => 'indira-nuansa-ratri-s-m-m-sm',
                 'name' => 'Indira Nuansa Ratri, S.M.,M.SM',
@@ -384,12 +386,12 @@ class EmployeeSeeder extends Seeder
                 'phone_number'=> '083117703473',
                 'address'=> 'Dusun Krajan Barat Rt 1 Rw 1, Desa Singonjuruh Kecamatan Singonjuruh',
                 "id_sdm" => "bb5e6c12-4fee-42ff-a323-0d2d47a55f1a",
+                'role' => 'Dosen',
             ],
             [
                 'employee_type_id' => 3,
                 'employee_status_id' => 1,
                 'employee_program_studi_id' => 1,
-                'user_id' => 1,
                 'identity_number' => '198711032021212001',
                 'slug' => 'dian-mujiani-s-e',
                 'name' => 'Dian Mujiani, S.E',
@@ -400,12 +402,12 @@ class EmployeeSeeder extends Seeder
                 'phone_number'=> '085 333859623',
                 'address'=> 'Jl. Ikan Cakalang 31 Banyuwangi',
                 "id_sdm" => "10208d04-551d-43ed-ab7a-d672fbe88b35",
+                'role' => 'Dosen',
             ],
             [
                 'employee_type_id' => 2,
                 'employee_status_id' => 1,
                 'employee_program_studi_id' => 1,
-                'user_id' => 1,
                 'identity_number' => '198810152014041001',
                 'slug' => 'fendi-hermawanto-a-md',
                 'name' => 'Fendi Hermawanto, A.Md',
@@ -416,12 +418,12 @@ class EmployeeSeeder extends Seeder
                 'phone_number'=> '',
                 'address'=> '',
                 "id_sdm" => "29c162a6-2eb9-4a3e-a398-5960b765e786",
+                'role' => 'Dosen',
             ],
             [
                 'employee_type_id' => 2,
                 'employee_status_id' => 1,
                 'employee_program_studi_id' => 1,
-                'user_id' => 1,
                 'identity_number' => '2013.36.105',
                 'slug' => 'muhamad-nur-hariri-a-md',
                 'name' => 'Muhammad Nur Hariri, A.Md',
@@ -432,12 +434,12 @@ class EmployeeSeeder extends Seeder
                 'phone_number'=> '087857297775',
                 'address'=> 'Dusun Srono RT02/03 Kebaman Srono - Banyuwnagi 68471',
                 "id_sdm" => "",
+                'role' => 'Dosen',
             ],
             [
                 'employee_type_id' => 2,
                 'employee_status_id' => 1,
                 'employee_program_studi_id' => 1,
-                'user_id' => 1,
                 'identity_number' => '198705032014041001',
                 'slug' => 'hida-jaya-habibi-a-md',
                 'name' => 'Hida Jaya Habibi, A.Md',
@@ -448,12 +450,12 @@ class EmployeeSeeder extends Seeder
                 'phone_number'=> '081230557807',
                 'address'=> 'Dsn. Krajan Rt 02/Rw 05 Desa Kabat Kecamatan Kabat - Banyuwangi 68461',
                 "id_sdm" => "518473dd-8bba-4519-bb53-8422f2de6e8f",
+                'role' => 'Dosen',
             ],
             [
                 'employee_type_id' => 2,
                 'employee_status_id' => 1,
                 'employee_program_studi_id' => 1,
-                'user_id' => 1,
                 'identity_number' => '2013.36.108',
                 'slug' => 'nur-cholik-hasyim-a-md',
                 'name' => 'Nur Cholik Hasyim, A.Md',
@@ -464,7 +466,36 @@ class EmployeeSeeder extends Seeder
                 'phone_number'=> '087857297775',
                 'address'=> 'Dusun Srono RT02/03 Kebaman Srono - Banyuwnagi 68471',
                 "id_sdm" => "",
+                'role' => 'Dosen',
             ],
-        ]);
+        ];
+
+        foreach ($employees as $data) {
+            $user = User::create([
+                'username' => strtolower(str_replace(' ', '', $data['name'])),
+                'name' => $data['name'],
+                'email' => $data['email'],
+                'password' => Hash::make('1234'),
+                'is_active' => true,
+            ]);
+
+            $user->assignRole($data['role']);
+
+            Employee::create([
+                'user_id' => $user->id,
+                'employee_type_id' => $data['employee_type_id'],
+                'employee_status_id' => $data['employee_status_id'],
+                'employee_program_studi_id' => $data['employee_program_studi_id'],
+                'identity_number' => $data['identity_number'],
+                'slug' => $data['slug'],
+                'name' => $data['name'],
+                'gender' => $data['gender'],
+                'image' => $data['image'],
+                'nidn'=> $data['nidn'],
+                'phone_number'=> $data['phone_number'],
+                'address'=> $data['address'],
+                'id_sdm' => $data['id_sdm'],
+            ]);
+        }
     }
 }

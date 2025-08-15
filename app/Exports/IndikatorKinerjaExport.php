@@ -27,7 +27,9 @@ class IndikatorKinerjaExport implements FromArray, WithHeadings, WithEvents, Wit
                     return $indikator;
                 });
             })
-            ->groupBy('program_studi');
+            ->groupBy(function ($indikator) {
+                return $indikator->programStudi->name ?? 'Tanpa Program Studi';
+            });
     }
 
     public function array(): array
@@ -36,7 +38,6 @@ class IndikatorKinerjaExport implements FromArray, WithHeadings, WithEvents, Wit
         $no = 1;
 
         foreach ($this->grouped as $programStudi => $indikators) {
-            // Tambahkan baris program studi
             $result[] = [$programStudi];
             foreach ($indikators as $indikator) {
                 $targets = collect($indikator->targetRealisasis);

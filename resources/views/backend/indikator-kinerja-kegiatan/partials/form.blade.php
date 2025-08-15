@@ -17,13 +17,17 @@
                             <input type="text" name="kode" id="kode" class="form-control" readonly>
                         </div>
                         <div class="col-md-4">
-                            <label for="program_studi" class="form-label">Program Studi</label>
-                            <select name="program_studi" id="program_studi" class="form-control" required>
-                                <option value="">-- Pilih Program Studi --</option>
-                                <option value="TRPL">TRPL</option>
-                                <option value="TRK">TRK</option>
-                                <option value="BSD">BSD</option>
+                            <label for="program_studi_id" class="form-label">Program Studi</label>
+                            @if (getInfoLogin()->roles[0]->name == 'Kaprodi')
+                            <input type="text" name="program_studi_id" id="program_studi" class="form-control" value="{{ getInfoLogin()->employee->employeeProgramStudi->name }}" readonly>
+                            @else
+                            <select name="program_studi_id" id="program_studi_id" class="form-control">
+                                <option disabled selected hidden>-- Pilih Program Studi --</option>
+                                @foreach ($programStudi as $item)
+                                    <option value="{{ $item->id }}">{{ $item->name }}</option>
+                                @endforeach
                             </select>
+                            @endif
                         </div>
                         <div class="col-md-4">
                             <label for="year">Tahun</label>

@@ -13,6 +13,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use App\Models\Achievement;
 use App\Exports\IndikatorKinerjaExport;
+use App\Models\EmployeeProgramStudi;
 use Maatwebsite\Excel\Facades\Excel;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Str;
@@ -273,7 +274,8 @@ class HomeController extends Controller
             'title' => 'Indikator Kinerja Utama Jurusan',
             'sasaran_kinerja' => $data,
             'tahun' => $tahun,
-            'prodi' => $prodi
+            'prodi' => $prodi,
+            'programStudi' => EmployeeProgramStudi::all()
         ]);
     }
 
@@ -302,7 +304,7 @@ class HomeController extends Controller
         $query = SasaranKinerja::with([
             'indikatorKinerjaKegiatans' => function ($q) use ($tahun, $prodi) {
                 if ($prodi && $prodi !== 'all') {
-                    $q->where('program_studi', $prodi);
+                    $q->where('program_studi_id', $prodi);
                 }
 
                 $q->whereHas('targetRealisasis', function ($q2) use ($tahun) {

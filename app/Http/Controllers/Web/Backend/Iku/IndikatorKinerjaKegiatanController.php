@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Web\Backend\Iku;
 
 use App\Http\Controllers\Controller;
+use App\Models\Employee;
+use App\Models\EmployeeProgramStudi;
 use App\Models\SasaranKinerja;
 use App\Models\IndikatorKinerjaKegiatan;
 use Carbon\Carbon;
@@ -17,16 +19,20 @@ class IndikatorKinerjaKegiatanController extends Controller
         $title = 'Indikator Kinerja Kegiatan';
         $mods = 'indikator_kinerja_kegiatan';
         $sasaran = SasaranKinerja::orderBy('nama')->get();
-        return customView('indikator-kinerja-kegiatan.index', compact('title', 'mods', 'sasaran'), 'backend');
+        $programStudi = EmployeeProgramStudi::orderBy('name')->get();
+        return customView('indikator-kinerja-kegiatan.index', compact('title', 'mods', 'sasaran', 'programStudi'), 'backend');
     }
 
     public function list(Request $request)
     {
         if ($request->ajax()) {
-            $query = IndikatorKinerjaKegiatan::with(['sasaranKinerja'])->orderBy('kode');
+            $auth = auth()->user();
 
-            if ($request->has('program_studi') && $request->program_studi != 'all') {
-                $query->where('program_studi', $request->program_studi);
+            $employee = Employee::where('user_id', $auth->id)->first();
+            $query = IndikatorKinerjaKegiatan::with(['sasaranKinerja', 'programStudi'])->orderBy('kode');
+
+            if ($request->has('program_studi_id') && $request->program_studi_id != 'all') {
+                $query->where('program_studi_id', $request->program_studi_id);
             }
 
             if ($request->has('tahun') && $request->tahun && $request->tahun != 'all') {
@@ -38,11 +44,30 @@ class IndikatorKinerjaKegiatanController extends Controller
                 ->addColumn('sasaran', function ($row) {
                     return $row->sasaranKinerja ? $row->sasaranKinerja->nama : '-';
                 })
-                ->addColumn('action', function ($row) {
-                    return '
-                    <button class="btn btn-outline-primary btn-sm" onclick="showForm(' . $row->id . ')"><i class="feather icon-edit"></i></button>
-                    <button class="btn btn-outline-danger btn-sm" onclick="deleteData(' . $row->id . ')"><i class="feather icon-trash-2"></i></button>
-                ';
+                ->addColumn('action', function ($row) use ($employee) {
+                    if (getInfoLogin()->hasRole(['Administrator', 'Developer'])) {
+                        return '
+                            <button class="btn btn-outline-primary btn-sm" onclick="showForm(' . $row->id . ')">
+                                <i class="feather icon-edit"></i>
+                            </button>
+                            <button class="btn btn-outline-danger btn-sm" onclick="deleteData(' . $row->id . ')">
+                                <i class="feather icon-trash-2"></i>
+                            </button>
+                        ';
+                    }
+
+                    if ($employee && $employee->employee_program_studi_id == $row->program_studi_id) {
+                        return '
+                            <button class="btn btn-outline-primary btn-sm" onclick="showForm(' . $row->id . ')">
+                                <i class="feather icon-edit"></i>
+                            </button>
+                            <button class="btn btn-outline-danger btn-sm" onclick="deleteData(' . $row->id . ')">
+                                <i class="feather icon-trash-2"></i>
+                            </button>
+                        ';
+                    }
+
+                    return '';
                 })
                 ->rawColumns(['action'])
                 ->make(true);
@@ -57,16 +82,19 @@ class IndikatorKinerjaKegiatanController extends Controller
             'sasaran_kinerja_id' => 'required|exists:sasaran_kinerjas,id',
             'target_akhir' => 'nullable|string',
             'realisasi_akhir' => 'nullable|string',
-            'program_studi' => 'required|string',
+            'program_studi_id' => 'required',
             'year' => 'required',
         ], [
             'kode.unique' => 'Kode sudah digunakan',
         ]);
 
-        $indikator = IndikatorKinerjaKegiatan::updateOrCreate(
-            ['id' => $request->id],
-            $request->only('kode', 'year', 'deskripsi', 'sasaran_kinerja_id', 'target_akhir', 'realisasi_akhir', 'program_studi')
-        );
+        if (getInfoLogin()->roles[0]->name == 'Kaprodi') {
+            $prodi = EmployeeProgramStudi::where('name', $request->program_studi_id)->first();
+            $request->merge([
+                'program_studi_id' => $prodi->id
+            ]);
+        }
+        $indikator = IndikatorKinerjaKegiatan::create($request->only(['kode', 'year', 'deskripsi', 'sasaran_kinerja_id', 'target_akhir', 'realisasi_akhir', 'program_studi_id']));
 
         return response()->json(['status' => true, 'data' => $indikator]);
     }
@@ -79,21 +107,28 @@ class IndikatorKinerjaKegiatanController extends Controller
             'sasaran_kinerja_id' => 'required|exists:sasaran_kinerjas,id',
             'target_akhir' => 'nullable|string',
             'realisasi_akhir' => 'nullable|string',
-            'program_studi' => 'required|string',
+            'program_studi_id' => 'required',
             'year' => 'required',
         ]);
 
         $indikator = IndikatorKinerjaKegiatan::findOrFail($id);
 
-        $indikator->update($request->only(
+        if (getInfoLogin()->roles[0]->name == 'Kaprodi') {
+            $prodi = EmployeeProgramStudi::where('name', $request->program_studi_id)->first();
+            $request->merge([
+                'program_studi_id' => $prodi->id
+            ]);
+        }
+
+        $indikator->update($request->only([
             'kode',
             'deskripsi',
             'sasaran_kinerja_id',
             'target_akhir',
             'realisasi_akhir',
-            'program_studi',
+            'program_studi_id',
             'year'
-        ));
+        ]));
 
         return response()->json(['status' => true, 'data' => $indikator]);
     }
@@ -112,26 +147,6 @@ class IndikatorKinerjaKegiatanController extends Controller
 
         return response()->json(['status' => true]);
     }
-
-
-    // public function kodeOptions()
-    // {
-    //     $kodeList = [
-    //         'IKU 1.1',
-    //         'IKU 1.2',
-    //         'IKU 2.1',
-    //         'IKU 2.2',
-    //         'IKU 2.3',
-    //         'IKU 3.1',
-    //         'IKU 3.2',
-    //         'IKU 3.3',
-    //         'IKU 3.4'
-
-    //     ];
-
-    //     return response()->json($kodeList);
-
-    // }
 
     public function lastCode(Request $request)
     {

@@ -72,4 +72,9 @@ class User extends Authenticatable
     {
         return $this->morphTo();
     }
+
+    public function employee()
+{
+    return $this->hasOne(Employee::class);
+}
 }

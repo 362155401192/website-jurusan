@@ -16,6 +16,8 @@ return new class extends Migration
             $table->year('year')->nullable();
             $table->float('target_akhir')->default(0);
             $table->float('realisasi_akhir')->default(0);
+            $table->foreignId('program_studi_id')->nullable();
+            $table->foreign('program_studi_id')->references('id')->on('employee_program_studis')->onDelete('cascade');
             $table->timestamps();
 
             $table->unique(['sasaran_kinerja_id', 'kode']); // Tidak boleh ada kode sama di sasaran yang sama

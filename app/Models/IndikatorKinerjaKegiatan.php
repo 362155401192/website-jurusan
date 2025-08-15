@@ -17,13 +17,18 @@ class IndikatorKinerjaKegiatan extends Model
         'deskripsi',
         'target_akhir',
         'realisasi_akhir',
-        'program_studi',
+        'program_studi_id',
         'year'
     ];
 
     public function sasaranKinerja()
     {
         return $this->belongsTo(SasaranKinerja::class, 'sasaran_kinerja_id');
+    }
+
+    public function programStudi()
+    {
+        return $this->belongsTo(EmployeeProgramStudi::class);
     }
 
     public function targetRealisasis()

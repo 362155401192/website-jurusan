@@ -110,7 +110,9 @@
                             return $indikator;
                         });
                     })
-                    ->groupBy('program_studi');
+                    ->groupBy(function ($indikator) {
+                        return $indikator->programStudi->name ?? 'Tanpa Program Studi';
+                    });
             @endphp
             @php $no = 1; @endphp
             @foreach ($grouped as $programStudi => $indikators)

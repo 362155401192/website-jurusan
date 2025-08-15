@@ -19,9 +19,9 @@
                     <div class="col-lg-3 col-md-4 col-sm-12 mb-3">
                         <select class="form-control" id="filterProdi">
                             <option value="all">Semua Program Studi</option>
-                            <option value="TRPL">TRPL</option>
-                            <option value="TRK">TRK</option>
-                            <option value="BSD">BSD</option>
+                            @foreach ($programStudi as $item)
+                            <option value="{{ $item->id }}">{{ $item->name }}</option>
+                            @endforeach
                         </select>
                     </div>
                     <div class="col-lg-3 col-md-4 col-sm-12 mb-3">
